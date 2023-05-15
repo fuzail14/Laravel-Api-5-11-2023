@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\Report;
 use Illuminate\Http\Request;
 use App\Models\Resident;
 use App\Models\Bill;
@@ -18,20 +17,21 @@ class BillController extends Controller
 
 
 
-    
+
     public function generatebill(Request $request)
     {
 
-      
 
-     $isValidate = Validator::make($request->all(), [
 
-        'subadminid' => 'required|exists:users,id',
-        'duedate' => 'required',
-        'billstartdate' => 'required',
-        'billenddate' => 'required',
-        'status'=>'required'
+        $isValidate = Validator::make($request->all(), [
+
+            'subadminid' => 'required|exists:users,id',
+            'duedate' => 'required|date|after:billenddate',
+            'billstartdate' => 'required|date',
+            'billenddate' => 'required|date|after:billstartdate',
+            'status' => 'required'
         ]);
+
 
         if ($isValidate->fails()) {
             return response()->json([
@@ -40,194 +40,233 @@ class BillController extends Controller
             ], 403);
         }
 
-      $res= Resident::where('subadminid', $request->subadminid)->where('status', 1)->where('propertytype','house')
-      ->join('users', 'users.id', '=', 'residents.residentid')->get();
 
-      $residentlist=[];
-      $noOfAppUsers=1;
+        $noOfAppUsers = 1;
+        $charges = 0.0;
+        $chargesafterduedate = 0.0;
+        $latecharges = 0.0;
+        $tax = 0.0;
+        $balance = 0.0;
+        $payableamount = 0.0;
+        $subadminid = 0;
+        $residnentid = 0;
+        $propertyid = 0;
+        $measurementid = 0;
+        $duedate = null;
+        $billstartdate = null;
+        $billenddate = null;
+        $getmonth = null;
+        $month = null;
+        $status = 0;
+        $previousPayableAmount=0.0;
+        $previousBalance=0.0;
+        $subadminid = $request->subadminid;
+        $status = $request->status;
+        $duedate = $request->duedate;
+        $billstartdate = $request->billstartdate;
+        $billenddate = $request->billenddate;
 
-      foreach($res as $li)
-      {
 
-    
-        array_push($residentlist, $li->residentid);
-        $noOfusers= Familymember::where('subadminid',$request->subadminid)->where('residentid',$li->residentid)->count();
-        $noOfAppUsers=$noOfAppUsers+ $noOfusers;
+
+
+        $residents = Resident::where('subadminid', $subadminid)->where('status', 1)->where('propertytype', 'house')
+            ->join('users', 'users.id', '=', 'residents.residentid')->get();
+
+
+
+        foreach ($residents as $residents) {
+
+            // fetching resident details from db
+            
+             $residnentsLi = Houseresidentaddress::where('houseresidentaddresses.residentid', $residents->residentid )
+            ->join('residents', 'houseresidentaddresses.residentid', '=', 'residents.residentid')
+            ->with('property')
+            ->with('measurement')
+            ->first();
+
+
+            $measurement =  $residnentsLi ->measurement;
+            $property =  $residnentsLi ->property;
+            $residnentid= $residnentsLi->residentid;
+
+            
+            $noOfusers = Familymember::where('subadminid', $subadminid)->where('residentid', $residnentid)->count();
+            $residentItSelf = 1;
+            $noOfAppUsers = $noOfusers + $residentItSelf;
+
+         
+            $getmonth = Carbon::parse($billstartdate)->format('F Y');
+            $month = $getmonth;
+
+
+                    foreach ($measurement as $measurement) {
+
+
+                $measurementid = $measurement->id;
+                $charges = $measurement->charges;
+                $appcharge = $measurement->appcharges * $noOfAppUsers;
+                $tax = $measurement->tax;
+                $payableamount = $appcharge + $tax + $charges;
+                $latecharges = $measurement->latecharges;
+                $chargesafterduedate = ($measurement->chargesafterduedate + $appcharge + $tax);
+                $balance = $payableamount;
+
+              }
+
+                foreach ($property as $property) {
+
+                $propertyid = $property->id;
+}
+
+
+
+     $firstDate = Carbon::parse($billstartdate);
+            $existingBill = Bill::where('residentid', $residnentid)
+            ->where('subadminid',$subadminid)
+                ->whereMonth('billstartdate', $firstDate->month)
+                ->whereYear('billstartdate', $firstDate->year)
+                ->get();
+
+
+            foreach ($existingBill as $existingBill) {
+
+                if ($existingBill != null) {
+
+                    $firstDate = Carbon::parse($billstartdate);
+                    $secondDate = Carbon::parse($existingBill->billstartdate);
+
+
+                    if ($firstDate->year === $secondDate->year && $firstDate->month === $secondDate->month) {
+
+
+                        return response()->json(['message' => 'the bill of this month is already generated !.'], 400);
+
+                    }
+
+
+                }
+
+
+            }
+
+            
+            $previousBill = Bill::where('residentid', $residnentid)->where('subadminid',$subadminid)
+                ->whereIn('status', [0, 1])->whereIn('isbilllate', [0, 1])->GET();
+
+
+   
+            
+
+            foreach ($previousBill as $previousBill)
+
+            {
+                
+                
+
+                    $previousPayableAmount=$previousBill->payableamount;
+                     $previousBalance=$previousBill->balance;
+
+        
+                  
+
+            }
+
+
+
+            
+            $bill = new Bill();
+
+
+
+           $bill->insert(
+                [
+
+                    [
+                        'charges' => $charges,
+                        'chargesafterduedate' => $chargesafterduedate,
+                        'latecharges' => $latecharges,
+                        'appcharges' => $appcharge,
+                        'tax' => $tax,
+                        'payableamount' => $payableamount + $previousPayableAmount,
+                        'balance' => $balance+ $previousBalance ,
+                        'subadminid' => $subadminid,
+                        'residentid' => $residnentid,
+                        'propertyid' => $propertyid,
+                        'measurementid' => $measurementid,
+                        'duedate' => $duedate,
+                        'billstartdate' => $billstartdate,
+                        'billenddate' => $billenddate,
+                        'month' => $month,
+                        'status' => $status,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                        'noofappusers' => $noOfAppUsers
+                    ],
+
+                ]
+            );
+            
+
+
+
+        }
+
+
+
+
+
+
 
        
-      }
-
-    
       
-      $charges=0.0;
-      $chargesafterduedate=0.0;
-      $appcharges=0.0;
-      $tax=0.0;
-      $balance=0.0;	
-      $subadminid=0;
-      $residnentid=0;
-      $propertyid=0;
-      $measurementid=0;
-      $duedate=null;
-      $billstartdate=null;
-     $billenddate=null;
-     $getmonth=null;
-     $month=null;
-     $status=0;
-     $payableamount=0.0;
-    
 
-
-
-
-  
-
-    
-
-        foreach ($residentlist as $li)
-
-{
-
-    $residnents = Houseresidentaddress::where('houseresidentaddresses.residentid', $li)->join('residents', 'houseresidentaddresses.residentid', '=', 'residents.residentid')->with('property')->with('measurement')->first();
-    $measurement =$residnents['measurement'];
-    $property =$residnents['property'];
-    $subadminid=$request->subadminid;
-    $residnentid=$residnents->residentid;
-    $status= $request->status;
-    $duedate=$request->duedate;
-    $billstartdate=$request->billstartdate;
-    $billenddate=$request->billenddate;
-    $getmonth = Carbon::parse( $duedate)->format('F Y');
-    $month=$getmonth;
-  
-
-  
-    foreach ($measurement as $measurement)
-
-    {
         
 
-$measurementid=$measurement->id;
-$charges=$measurement->charges;
-$appcharge=$measurement->appcharges;
-$tax=$measurement->tax;
-$payableamount=($appcharge*$noOfAppUsers)+($tax+$charges);
-$chargesafterduedate=($measurement->chargesafterduedate+($appcharge*$noOfAppUsers)+$tax);
-$balance=$payableamount;
+
+             return response()->json([
+            "success" => true,
+            "message" => 'Bill generated Successfully'
+        ]);
 
 
 
-    }
-
-    foreach ($property as $property)
-
-    { 
-        $propertyid= $property->id;
 
 
-    }
-
-    $firstDate = Carbon::parse($duedate);
-
-    
-    $existingBill = Bill::where('residentid', $residnentid)
-                        ->whereMonth('duedate',  $firstDate->month)
-                        ->whereYear('duedate',  $firstDate->year)
-                        ->first();
-
-                  
-       if($existingBill!=null)
-
-{
-                $firstDate = Carbon::parse($duedate);
-                $secondDate = Carbon::parse( $existingBill->duedate);
-              
-              
-    if ($firstDate->year === $secondDate->year&&$firstDate->month === $secondDate->month ) {
-        return response()->json(['message' => 'A bill has already been generated for this user in this month.'], 400);
-    }
-   
-    
-   
-
-}
-
-
-
-$bill = new Bill();  
-
-
-
-$billstatus =  $bill->insert(
-[
-
- [
-      'charges'=>$charges,
-      'chargesafterduedate'=>$chargesafterduedate,
-      'appcharges'=>$appcharge,
-      'tax'=>$tax,
-      'payableamount'=>$payableamount,
-      'balance'=>$balance,
-     'subadminid' => $subadminid,
-     'residentid'=>$residnentid,
-     'propertyid'=>$propertyid,
-     'measurementid'=>$measurementid,
-     'duedate'=>$duedate,
-     'billstartdate'=>$billstartdate,
-     'billenddate'=>$billenddate,
-     'month'=>$month,
-     'status'=>$status,
-     'created_at' => date('Y-m-d H:i:s'),
-     'updated_at' => date('Y-m-d H:i:s'),
-     'noofappusers'=> $noOfAppUsers
- ],
-
-]
-);
-
-
-
-}
-
-return response()->json([
-    "success" => true,
-    
-    "message"=> "Monthly Bill Generated for Residents Successfully !"
-]);
-
-
-
-       
-   
     }
 
 
     public function generatedbill($subadminid)
     {
 
-        $bills =  Bill::where('subadminid', $subadminid) ->join('users', 'users.id', '=', 'bills.residentid')
-        ->select(
-            
-            'users.rolename',
-            'bills.*',
-            'users.firstname', 
-            'users.lastname',
-             'users.image',
-            'users.cnic',
-            'users.roleid',
-          
-            
-            
-            )->get();
+        // $bills =  Bill::where('subadminid', $subadminid) ->join('users', 'users.id', '=', 'bills.residentid')
+        // ->select(
+
+        //     'users.rolename',
+        //     'bills.*',
+        //     'users.firstname', 
+        //     'users.lastname',
+        //      'users.image',
+        //     'users.cnic',
+        //     'users.roleid',
 
 
 
-            $bills =  Bill::where('subadminid', $subadminid)
+        //     )->get();
+
+
+        $currentDate = date('Y-m-d');
+        $currentYear = date('Y', strtotime($currentDate));
+        $currentMonth = date('m', strtotime($currentDate));
+        $bills = Bill::where('subadminid', $subadminid) ->whereMonth('billenddate', $currentMonth)->whereYear(
+            'billenddate',
+            $currentYear
+        )
+        ->whereIn('status',[0,1])
             ->with('user')
             ->with('resident')
             ->with('measurement')
             ->with('property')
-        
+
             ->get();
 
 
@@ -242,7 +281,7 @@ return response()->json([
 
 
 
-    public function monthlybills($residnentid,)
+    public function monthlybills($residnentid )
     {
 
 
@@ -251,10 +290,12 @@ return response()->json([
         $currentYear = date('Y', strtotime($currentDate));
         $currentMonth = date('m', strtotime($currentDate));
 
-        $bills =  Bill::where('residentid',$residnentid)
-        ->whereMonth('billenddate', $currentMonth)->whereYear('billenddate',
-        $currentYear)
-        ->where('status', 0) ->get()->first();
+        $bills = Bill::where('residentid', $residnentid)
+            ->whereMonth('billenddate', $currentMonth)->whereYear(
+                'billenddate',
+                $currentYear
+            )
+            ->where('status', 0)->get()->first();
 
 
 
@@ -267,9 +308,129 @@ return response()->json([
     }
 
 
+   public function monthlybillupdateoverduedatestatus(Request $request)
+
+
+   {
+
+    
+
+    $isValidate = Validator::make($request->all(), [
+
+        'id' => 'required|exists:bills,id',
+        // 'payableamount' => 'required',
+    ]);
+
+
+    if ($isValidate->fails()) {
+        return response()->json([
+            "errors" => $isValidate->errors()->all(),
+            "success" => false
+        ], 403);
+    }
+
+
+    $bill = Bill::find($request->id);
+
+  
+
+
+          
+            //     $currentDate = strtotime("2023-09-15");
+                // $currentDate =  strtotime(date('Y-m-d'));
+                // $billDueDate= strtotime( $request->duedate);
+                // $payableAmount=$request->payableamount;
+
+
+
+
+                // if ($currentDate > $billDueDate) {
+            
+                //     $bill->isbilllate = 1;
+                //     $bill->payableamount = $payableAmount;
+                //     $bill->balance = $payableAmount;
+                //     $bill->update();
+
+
+
+                // }
+
+
+                // $currentDate =  strtotime(date('Y-m-d'));
+                // $billDueDate= strtotime( $request->duedate);
+                $payableAmount= $bill->payableamount;
+                $lateCharges= $bill->latecharges;
+                $amount=$payableAmount+$lateCharges;
+
+
+            
+                    $bill->isbilllate = 1;
+                    $bill->payableamount = $amount;
+                    $bill->balance = $amount;
+                    $bill->update();
+
+            
+
+
+                return response()->json([
+                    "success" => true,
+                    "message" => 'Bill status updated Successfully !'
+                ]);
+
+
+   }
+
+
 
 
     
- 
+
+
+    public function paybill($id)
+    {
+
+
+        $bill=Bill::find($id);
+        $billPaidStatus=1;
+        $payableAmount=0.0;
+        $balance=0.0;
+        $amount=0.0;
+
+        $payableAmount=$bill->payableamount;
+
+
+        $balance=$bill->balance;
+
+
+        $amount=$balance-$payableAmount;
+
+        if($amount<0)
+        {$amount=0.0;}
+    
+        $bill->payableamount=$amount;
+        $bill->balance=$amount;
+        $bill->status=$billPaidStatus;
+        $bill->update();
+
+
+
+
+        
+
+        return response()->json([
+            "success" => true,
+            "data" => $bill,
+            "message"=>"Bill Paid Successfully"
+        ]);
+
+
+    }
+
+
+
+
+
+
+
 
 }

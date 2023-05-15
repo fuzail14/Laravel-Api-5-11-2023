@@ -119,7 +119,11 @@ protected $primarykey='residentid';
         return $this->hasMany('App\Models\Resident','residentid','residentid');
     }
     
-
+    public function societydata()
+    {
+        return $this->hasMany('App\Models\Subadmin', 'subadminid', 'subadminid');
+    }
+ 
     protected $casts = [ "status"=> 'integer',
 
 

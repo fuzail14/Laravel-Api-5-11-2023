@@ -32,6 +32,10 @@ class Society extends Model
 
 
     ];
+    public function societydata()
+    {
+        return $this->hasMany('App\Models\Subadmin', 'subadminid', 'subadminid');
+    }
 
     use HasFactory;
 }

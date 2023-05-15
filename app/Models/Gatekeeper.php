@@ -8,8 +8,6 @@ class Gatekeeper extends Model
     protected $fillable = [
         "gatekeeperid",
         "subadminid",
-        "societyid",
-        
          "gateno",
     ];
 }

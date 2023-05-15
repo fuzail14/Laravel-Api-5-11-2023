@@ -55,44 +55,46 @@ class ResidentController extends Controller
 
     {
 
-        $isValidate = Validator::make($request->all(), 
-        [
+        $isValidate = Validator::make(
+            $request->all(),
+            [
 
 
-            "residentid" => 'required|exists:users,id',
-            "subadminid" => 'required|exists:users,id',
+                "residentid" => 'required|exists:users,id',
+                "subadminid" => 'required|exists:users,id',
 
-            "country" => "nullable",
-            "state" => "nullable",
-            "city" => "nullable",
-            "houseaddress" => "required",
-            "residenttype" => "required",
-            "propertytype" => "required",
-            "committeemember" => "required",
-            "status" => "required",
-            "vechileno" => "nullable",
+                "country" => "nullable",
+                "state" => "nullable",
+                "city" => "nullable",
+                "houseaddress" => "required",
+                "residenttype" => "required",
+                "propertytype" => "required",
+                "committeemember" => "required",
+                "status" => "required",
+                "vechileno" => "nullable",
 
-            /* owner details */
+                /* owner details */
 
-            "ownername" => "nullable",
-            "owneraddress" => "nullable",
-            "ownermobileno" => "nullable",
+                "ownername" => "nullable",
+                "owneraddress" => "nullable",
+                "ownermobileno" => "nullable",
 
-            /* apartment/houses details */
+                /* apartment/houses details */
 
-            "societyid" => "nullable",
-            "pid" => "nullable",
-            "bid" => "nullable",
-            "sid" => "nullable",
-            "propertyid" => "nullable",
-            "buildingid" => "nullable",
-            "societybuildingfloorid" => "nullable",
-            "societybuildingapartmentid" => "nullable",
-            "measurementid" => "nullable"
+                "societyid" => "nullable",
+                "pid" => "nullable",
+                "bid" => "nullable",
+                "sid" => "nullable",
+                "propertyid" => "nullable",
+                "buildingid" => "nullable",
+                "societybuildingfloorid" => "nullable",
+                "societybuildingapartmentid" => "nullable",
+                "measurementid" => "nullable"
 
 
 
-        ]);
+            ]
+        );
 
         if ($isValidate->fails()) {
             return response()->json([
@@ -104,38 +106,35 @@ class ResidentController extends Controller
 
 
 
-        if ($request->propertytype == 'house')  {
+        if ($request->propertytype == 'house') {
 
 
 
 
             $property = Property::find($request->propertyid);
-            
 
-            if($property->occupied==1)
 
-            {
+            if ($property->occupied == 1) {
                 return response()->json(
                     [
-        
+
                         "success" => true,
                         "message" => "Property Already Ocuupied by an other User.",
-                        
-        
-                    ],409
+
+
+                    ],
+                    409
                 );
-
-
             }
-    
+
 
 
             $resident = new Resident;
             $resident->residentid = $request->residentid;
             $resident->subadminid = $request->subadminid;
-            $resident->country = $request->country??"";
-            $resident->state = $request->state??"";
-            $resident->city = $request->city??"";
+            $resident->country = $request->country ?? "";
+            $resident->state = $request->state ?? "";
+            $resident->city = $request->city ?? "";
             $resident->houseaddress = $request->houseaddress ?? 'NA';
             $resident->vechileno = $request->vechileno ?? '';
             $resident->residenttype = $request->residenttype;
@@ -152,16 +151,16 @@ class ResidentController extends Controller
                 $owner->ownermobileno = $request->ownermobileno ?? "NA";
                 $owner->save();
             }
-    
-    
+
+
 
 
             $address  = new Houseresidentaddress;
             $address->residentid = $request->residentid;
             $address->societyid = $request->societyid;
-            $address->pid = $request->pid??0;
-            $address->bid = $request->bid??0;
-            $address->sid = $request->sid??0;
+            $address->pid = $request->pid ?? 0;
+            $address->bid = $request->bid ?? 0;
+            $address->sid = $request->sid ?? 0;
             $address->propertyid = $request->propertyid;
             $address->measurementid = $request->measurementid;
             $address->save();
@@ -169,44 +168,39 @@ class ResidentController extends Controller
 
             return response()->json(
                 [
-    
+
                     "success" => true,
                     "message" => "User Register  Successfully.",
-                    
-    
+
+
                 ]
             );
-        } 
-        else if($request->propertytype == 'apartment')
-        {
+        } else if ($request->propertytype == 'apartment') {
 
-            
+
             $societyBuildingaAartment = Societybuildingapartment::find($request->societybuildingapartmentid);
-            
 
-            if($societyBuildingaAartment ->occupied==1)
 
-            {
+            if ($societyBuildingaAartment->occupied == 1) {
                 return response()->json(
                     [
-        
+
                         "success" => true,
                         "message" => "Apartment Already Ocuupied by an other User.",
-                        
-        
-                    ],409
+
+
+                    ],
+                    409
                 );
-
-
             }
-    
+
 
             $resident = new Resident;
             $resident->residentid = $request->residentid;
             $resident->subadminid = $request->subadminid;
-            $resident->country = $request->country??"";
-            $resident->state = $request->state??"";
-            $resident->city = $request->city??"";
+            $resident->country = $request->country ?? "";
+            $resident->state = $request->state ?? "";
+            $resident->city = $request->city ?? "";
             $resident->houseaddress = $request->houseaddress ?? 'NA';
             $resident->vechileno = $request->vechileno ?? '';
             $resident->residenttype = $request->residenttype;
@@ -223,8 +217,8 @@ class ResidentController extends Controller
                 $owner->ownermobileno = $request->ownermobileno ?? "NA";
                 $owner->save();
             }
-    
-    
+
+
 
 
             $address  = new Apartmentresidentaddress;
@@ -239,46 +233,40 @@ class ResidentController extends Controller
 
             return response()->json(
                 [
-    
+
                     "success" => true,
                     "message" => "User Register  Successfully",
-                    
-    
+
+
                 ]
             );
-        }
+        } else {
 
-        else  {
- 
 
             $localBuildingApartment = Localbuildingapartment::find($request->aid);
-            
 
-            if($localBuildingApartment ->occupied==1)
 
-            {
-              
+            if ($localBuildingApartment->occupied == 1) {
+
                 return response()->json(
                     [
-        
+
                         "success" => true,
                         "message" => "Apartment Already Ocuupied by an other User.",
-                        
-        
-                    ],409
+
+
+                    ],
+                    409
                 );
-               
-
-
             }
 
 
             $resident = new Resident;
             $resident->residentid = $request->residentid;
             $resident->subadminid = $request->subadminid;
-            $resident->country = $request->country??"";
-            $resident->state = $request->state??"";
-            $resident->city = $request->city??"";
+            $resident->country = $request->country ?? "";
+            $resident->state = $request->state ?? "";
+            $resident->city = $request->city ?? "";
             $resident->houseaddress = $request->houseaddress ?? 'NA';
             $resident->vechileno = $request->vechileno ?? '';
             $resident->residenttype = $request->residenttype;
@@ -287,8 +275,8 @@ class ResidentController extends Controller
             $resident->status = $request->status ?? 0;
             $resident->save();
 
-            
-                 if ($resident->residenttype == 'Rental') {
+
+            if ($resident->residenttype == 'Rental') {
                 $owner = new Owner;
                 $owner->residentid = $resident->residentid;
                 $owner->ownername = $request->ownername ?? "NA";
@@ -309,35 +297,27 @@ class ResidentController extends Controller
 
             return response()->json(
                 [
-    
+
                     "success" => true,
                     "message" => "User Register  Successfully",
-                    
-    
+
+
                 ]
             );
-    
         }
-
-
-
-       
-
-
-
-      
     }
 
     public function viewresidents($id)
 
 
     {
-        
+
 
         $data = Resident::where('subadminid', $id)->where('status', 1)
-            ->join('users', 'users.id', '=', 'residents.residentid')->get();
+            ->join('users', 'users.id', '=', 'residents.residentid',)->with('societydata')
+            ->get();
 
-        
+
 
         return response()->json(
             [
@@ -346,7 +326,6 @@ class ResidentController extends Controller
             ]
         );
     }
-
 
     public function deleteresident($id)
 
@@ -445,7 +424,7 @@ class ResidentController extends Controller
     public function loginresidentdetails($residentid)
 
     {
-        $data = Resident::where('residentid', $residentid)->first();
+        $data = Resident::where('residentid', $residentid)->with('societydata')->first();
 
 
 
@@ -550,18 +529,18 @@ class ResidentController extends Controller
     public function unverifiedhouseresident($subadminid, $status)
 
     {
-        
+
         $residents = Resident::where('subadminid', $subadminid)->where('status', $status)->where('propertytype', 'house')
-        ->join('houseresidentaddresses', 'residents.residentid', '=', 'houseresidentaddresses.residentid')->join('users', 'users.id', '=', 'houseresidentaddresses.residentid')
-        ->with('society')
-        ->with('phase')
-        ->with('block')
-        ->with('street')
-        ->with('property')
-        ->with('measurement')->with('owner')->get();
+            ->join('houseresidentaddresses', 'residents.residentid', '=', 'houseresidentaddresses.residentid')->join('users', 'users.id', '=', 'houseresidentaddresses.residentid')
+            ->with('society')
+            ->with('phase')
+            ->with('block')
+            ->with('street')
+            ->with('property')
+            ->with('measurement')->with('owner')->get();
 
 
-    
+
 
 
         return response()->json([
@@ -576,7 +555,7 @@ class ResidentController extends Controller
     public function unverifiedapartmentresident($subadminid, $status)
 
     {
-       
+
 
 
         $residents = Resident::where('subadminid', $subadminid)->where('status', $status)->where('propertytype', 'apartment')
@@ -625,30 +604,27 @@ class ResidentController extends Controller
 
             ], 403);
         }
-      
+
         $property = Property::find($request->propertyid);
-            
 
-        if($property->occupied==1)
 
-        {
+        if ($property->occupied == 1) {
             return response()->json(
                 [
-    
+
                     "success" => true,
                     "message" => "Property Already Ocuupied by an other User.",
-                    
-    
-                ],409
+
+
+                ],
+                409
             );
-
-
         }
-        
+
 
         $property = Property::find($request->propertyid);
 
-        $property->occupied=1;
+        $property->occupied = 1;
         $property->update();
 
 
@@ -656,10 +632,10 @@ class ResidentController extends Controller
 
         $residents = Houseresidentaddress::where('residentid', $request->residentid)->first();
 
-        
 
-        $residents->pid = $request->pid??0;
-        $residents->bid = $request->bid??0;
+
+        $residents->pid = $request->pid ?? 0;
+        $residents->bid = $request->bid ?? 0;
         $residents->sid = $request->sid;
         $residents->propertyid = $request->propertyid;
         $residents->measurementid = $request->measurementid;
@@ -712,27 +688,24 @@ class ResidentController extends Controller
         }
 
         $societyBuildingApartment = Societybuildingapartment::find($request->societybuildingapartmentid);
-            
 
-        if($societyBuildingApartment ->occupied==1)
 
-        {
+        if ($societyBuildingApartment->occupied == 1) {
             return response()->json(
                 [
-    
+
                     "success" => true,
                     "message" => "Property Already Ocuupied by an other User.",
-                    
-    
-                ],409
+
+
+                ],
+                409
             );
-
-
         }
-        
+
 
         $societyBuildingApartment = Societybuildingapartment::find($request->societybuildingapartmentid);
-        $societyBuildingApartment->occupied=1;
+        $societyBuildingApartment->occupied = 1;
         $societyBuildingApartment->update();
 
 
@@ -794,25 +767,22 @@ class ResidentController extends Controller
 
 
         $localBuildingApartment = Localbuildingapartment::find($request->aid);
-            
 
-        if($localBuildingApartment ->occupied==1)
 
-        {
+        if ($localBuildingApartment->occupied == 1) {
             return response()->json(
                 [
-    
+
                     "success" => true,
                     "message" => "Apartment Already Ocuupied by an other User.",
-                    
-    
-                ],409
+
+
+                ],
+                409
             );
-
-
         }
         $localBuildingApartment = Localbuildingapartment::find($request->aid);
-        $localBuildingApartment->occupied=1;
+        $localBuildingApartment->occupied = 1;
         $localBuildingApartment->update();
 
 
@@ -849,7 +819,7 @@ class ResidentController extends Controller
     public function unverifiedlocalbuildingapartmentresident($subadminid, $status)
 
     {
-      
+
 
 
         $residents = Resident::where('subadminid', $subadminid)->where('status', $status)->where('propertytype', 'localbuildingapartment')
@@ -869,7 +839,4 @@ class ResidentController extends Controller
 
         ]);
     }
-
-
-
 }

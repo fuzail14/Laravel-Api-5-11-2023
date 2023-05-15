@@ -13,6 +13,7 @@ class Measurement extends Model
     protected $fillable = [
         	"subadminid",
             	"type",
+                "latecharges",
                 "unit",
             "charges",
             	"area",

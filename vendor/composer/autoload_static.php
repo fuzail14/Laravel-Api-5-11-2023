@@ -506,6 +506,7 @@ class ComposerStaticInit269fe5a2cd897fc22bd76652b866193f
     );
 
     public static $classMap = array (
+        'App\\Console\\Commands\\MonthlyBillUpdate' => __DIR__ . '/../..' . '/app/Console/Commands/MonthlyBillUpdate.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Event\\DiscussionChatEvent' => __DIR__ . '/../..' . '/app/Event/DiscussionChatEvent.php',
         'App\\Event\\UserChat' => __DIR__ . '/../..' . '/app/Event/UserChat.php',
@@ -526,6 +527,7 @@ class ComposerStaticInit269fe5a2cd897fc22bd76652b866193f
         'App\\Http\\Controllers\\GateKeeperController' => __DIR__ . '/../..' . '/app/Http/Controllers/GateKeeperController.php',
         'App\\Http\\Controllers\\LocalBuildingApartmentController' => __DIR__ . '/../..' . '/app/Http/Controllers/LocalBuildingApartmentController.php',
         'App\\Http\\Controllers\\LocalBuildingFloorController' => __DIR__ . '/../..' . '/app/Http/Controllers/LocalBuildingFloorController.php',
+        'App\\Http\\Controllers\\MarketPlaceController' => __DIR__ . '/../..' . '/app/Http/Controllers/MarketPlaceController.php',
         'App\\Http\\Controllers\\MeasurementController' => __DIR__ . '/../..' . '/app/Http/Controllers/MeasurementController.php',
         'App\\Http\\Controllers\\NoticeBoardController' => __DIR__ . '/../..' . '/app/Http/Controllers/NoticeBoardController.php',
         'App\\Http\\Controllers\\PhaseController' => __DIR__ . '/../..' . '/app/Http/Controllers/PhaseController.php',
@@ -541,7 +543,6 @@ class ComposerStaticInit269fe5a2cd897fc22bd76652b866193f
         'App\\Http\\Controllers\\StreetController' => __DIR__ . '/../..' . '/app/Http/Controllers/StreetController.php',
         'App\\Http\\Controllers\\SubAdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/SubAdminController.php',
         'App\\Http\\Controllers\\VistorDetailController' => __DIR__ . '/../..' . '/app/Http/Controllers/VistorDetailController.php',
-        'App\\Http\\Controllers\\verifyhouseresident' => __DIR__ . '/../..' . '/app/Http/Controllers/verifyhouseresident.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
@@ -572,6 +573,7 @@ class ComposerStaticInit269fe5a2cd897fc22bd76652b866193f
         'App\\Models\\Localbuildingapartment' => __DIR__ . '/../..' . '/app/Models/Localbuildingapartment.php',
         'App\\Models\\Localbuildingapartmentresidentaddress' => __DIR__ . '/../..' . '/app/Models/Localbuildingapartmentresidentaddress.php',
         'App\\Models\\Localbuildingfloor' => __DIR__ . '/../..' . '/app/Models/Localbuildingfloor.php',
+        'App\\Models\\Marketplace' => __DIR__ . '/../..' . '/app/Models/Marketplace.php',
         'App\\Models\\Measurement' => __DIR__ . '/../..' . '/app/Models/Measurement.php',
         'App\\Models\\Notice' => __DIR__ . '/../..' . '/app/Models/Notice.php',
         'App\\Models\\Owner' => __DIR__ . '/../..' . '/app/Models/Owner.php',

@@ -31,8 +31,6 @@ use App\Http\Controllers\LocalBuildingApartmentController;
 use App\Http\Controllers\DiscussionRoomController;
 use App\Http\Controllers\DiscussionChatController;
 use App\Http\Controllers\VistorDetailController;
-
-
 use Illuminate\Support\Facades\Artisan;
 
 
@@ -41,7 +39,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
   Route::post('society/addsociety', [SocietyController::class, 'addsociety']);
-  Route::put('society/updatesociety', [SocietyController::class, 'updatesociety']);
+  Route::post('society/updatesociety', [SocietyController::class, 'updatesociety']);
   Route::get('society/viewallsocieties/{userid}', [SocietyController::class, 'viewallsocieties']);
   Route::get('society/deletesociety/{id}', [SocietyController::class, 'deletesociety']);
   Route::get('society/viewsociety/{societyid}', [SocietyController::class, 'viewsociety']);
@@ -123,6 +121,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('preapproventrynotifications/{userid}', [PreApproveEntryController::class, 'preapproventrynotifications']);
   Route::get('preapproveentries/{userid}', [PreApproveEntryController::class, 'preapproveentries']);
   Route::get('preapproveentryhistories/{userid}', [PreApproveEntryController::class, 'preapproveentryhistories']);
+  Route::post('searchpreapproventry', [PreApproveEntryController::class, 'searchpreapproventry']);
+
 
 
 
@@ -205,9 +205,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
   //Bills
   Route::post('generatebill', [BillController::class, 'generatebill']);
+  Route::post('monthlybillupdateoverduedatestatus', [BillController::class, 'monthlybillupdateoverduedatestatus']);
 
   Route::get('generatedbill/{subadminid}', [BillController::class, 'generatedbill']);
   Route::get('monthlybills/{residenid}', [BillController::class, 'monthlybills']);
+  Route::get('paybill/{id}', [BillController::class, 'paybill']);
+
+
+
   Route::post('verifyhouseresident', [ResidentController::class, 'verifyhouseresident']);
 
 
@@ -224,16 +229,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
   //Discussion Forum
   Route::post('creatediscussionroom', [DiscussionRoomController::class, 'creatediscussionroom']);
   Route::post('discussionchats', [DiscussionChatController::class, 'discussionchats']);
-
   Route::get('alldiscussionchats/{discussionroomid}', [DiscussionChatController::class, 'alldiscussionchats']);
 
 
-
+  //VISTOR DETAIL
 
   Route::post('addvistordetail', [VistorDetailController::class, 'addvistordetail']);
   Route::get('viewvistordetail/{societyid}', [VistorDetailController::class, 'viewvistordetail']);
   Route::get('searchResident/{subadminid}', [VistorDetailController::class, 'searchResident']);
   Route::post('updateVistorStatus', [VistorDetailController::class, 'updateVistorStatus']);
+  //Market Place
+
+  Route::post('addProduct', [MarketPlaceController::class, 'addProduct']);
+  Route::get('viewProducts/{societyid}', [MarketPlaceController::class, 'viewProducts']);
 });
 
 
@@ -244,4 +252,3 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::post('login', [RoleController::class, 'login']);
 Route::post('residentlogin', [ResidentController::class, 'residentlogin']);
 Route::post('registeruser', [RoleController::class, 'registeruser']);
-Route::get('allusers', [RoleController::class, 'allusers']);

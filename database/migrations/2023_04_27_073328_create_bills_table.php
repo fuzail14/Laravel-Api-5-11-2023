@@ -20,6 +20,7 @@ class CreateBillsTable extends Migration
             $table->id();
             $table->decimal('charges');
             $table->decimal('chargesafterduedate');
+            $table->decimal('latecharges');
             $table->decimal('appcharges');
             $table->decimal('tax');
             $table->decimal('balance');
@@ -37,8 +38,10 @@ class CreateBillsTable extends Migration
             $table->date('billenddate');
             $table->string('month');
             $table->integer('status');
+            $table->integer('isbilllate')->default(0);
             $table->integer('noofappusers');
             $table->timestamps();
+            
         });
     }
 

@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Console\\Commands\\MonthlyBillUpdate' => $baseDir . '/app/Console/Commands/MonthlyBillUpdate.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Event\\DiscussionChatEvent' => $baseDir . '/app/Event/DiscussionChatEvent.php',
     'App\\Event\\UserChat' => $baseDir . '/app/Event/UserChat.php',
@@ -26,6 +27,7 @@ return array(
     'App\\Http\\Controllers\\GateKeeperController' => $baseDir . '/app/Http/Controllers/GateKeeperController.php',
     'App\\Http\\Controllers\\LocalBuildingApartmentController' => $baseDir . '/app/Http/Controllers/LocalBuildingApartmentController.php',
     'App\\Http\\Controllers\\LocalBuildingFloorController' => $baseDir . '/app/Http/Controllers/LocalBuildingFloorController.php',
+    'App\\Http\\Controllers\\MarketPlaceController' => $baseDir . '/app/Http/Controllers/MarketPlaceController.php',
     'App\\Http\\Controllers\\MeasurementController' => $baseDir . '/app/Http/Controllers/MeasurementController.php',
     'App\\Http\\Controllers\\NoticeBoardController' => $baseDir . '/app/Http/Controllers/NoticeBoardController.php',
     'App\\Http\\Controllers\\PhaseController' => $baseDir . '/app/Http/Controllers/PhaseController.php',
@@ -41,7 +43,6 @@ return array(
     'App\\Http\\Controllers\\StreetController' => $baseDir . '/app/Http/Controllers/StreetController.php',
     'App\\Http\\Controllers\\SubAdminController' => $baseDir . '/app/Http/Controllers/SubAdminController.php',
     'App\\Http\\Controllers\\VistorDetailController' => $baseDir . '/app/Http/Controllers/VistorDetailController.php',
-    'App\\Http\\Controllers\\verifyhouseresident' => $baseDir . '/app/Http/Controllers/verifyhouseresident.php',
     'App\\Http\\Kernel' => $baseDir . '/app/Http/Kernel.php',
     'App\\Http\\Middleware\\Authenticate' => $baseDir . '/app/Http/Middleware/Authenticate.php',
     'App\\Http\\Middleware\\EncryptCookies' => $baseDir . '/app/Http/Middleware/EncryptCookies.php',
@@ -72,6 +73,7 @@ return array(
     'App\\Models\\Localbuildingapartment' => $baseDir . '/app/Models/Localbuildingapartment.php',
     'App\\Models\\Localbuildingapartmentresidentaddress' => $baseDir . '/app/Models/Localbuildingapartmentresidentaddress.php',
     'App\\Models\\Localbuildingfloor' => $baseDir . '/app/Models/Localbuildingfloor.php',
+    'App\\Models\\Marketplace' => $baseDir . '/app/Models/Marketplace.php',
     'App\\Models\\Measurement' => $baseDir . '/app/Models/Measurement.php',
     'App\\Models\\Notice' => $baseDir . '/app/Models/Notice.php',
     'App\\Models\\Owner' => $baseDir . '/app/Models/Owner.php',

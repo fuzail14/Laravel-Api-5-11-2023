@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateVistordetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,23 +13,32 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('preapproveentries', function (Blueprint $table) {
+        Schema::create('vistordetails', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gatekeeperid');
             $table->foreign('gatekeeperid')->references('id')->on('users')->onDelete('cascade');
-            $table->unsignedBigInteger('userid');
-            $table->foreign('userid')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('societyid');
+            $table->foreign('societyid')->references('id')->on('societies')->onDelete('cascade');
+            $table->unsignedBigInteger('subadminid');
+            $table->foreign('subadminid')->references('id')->on('users')->onDelete('cascade');
+            
+            $table->string('houseaddress');
+
             $table->string('visitortype');
             $table->string('name');
-            $table->string('description');
+            
             $table->string('cnic');
             $table->string('mobileno');
             $table->string('vechileno');
             $table->date('arrivaldate');
             $table->time('arrivaltime');
+            $table->date('checkoutdate');
+            $table->time('checkouttime');
+            
             $table->integer('status');
             $table->string('statusdescription');
             $table->timestamps();
+            
         });
     }
 
@@ -40,6 +49,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('preapproveentries');
+        Schema::dropIfExists('vistordetails');
     }
-};
+}

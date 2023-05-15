@@ -45,6 +45,7 @@ class GateKeeperController extends Controller
         $imageName = time() . "." . $image->extension();
         $image->move(public_path('/storage/'), $imageName);
         $user->image = $imageName;
+        
         $user->save();
         $tk =   $user->createToken('token')->plainTextToken;
         $gatekeeper = new Gatekeeper;

@@ -14,6 +14,7 @@ class MeasurementController extends Controller
             'unit' => 'required|string',
             'charges' => 'required',
             'chargesafterduedate' => 'required',
+            'latecharges' => 'required',
             'appcharges' => 'required',
             'tax' => 'required',
             'area' => 'required',
@@ -37,6 +38,7 @@ class MeasurementController extends Controller
         $measurement->subadminid = $request->subadminid;
         $measurement->chargesafterduedate = $request->chargesafterduedate;
         $measurement->appcharges = $request->appcharges;
+        $measurement->latecharges = $request->latecharges;
         $measurement->tax = $request->tax;
         $measurement->save();
 

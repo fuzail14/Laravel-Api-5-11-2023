@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Eventimage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Event;
@@ -107,55 +108,19 @@ class EventController extends Controller
 
     public function addeventimages(Request $request)
     {
-
-
-
-
-        $isValidate = Validator::make(
-            $request->all(), [
-
-            'eventid' => 'required|exists:events,id',
-            'image' => 'required',
-
-        ]);
-
-
-        if ($isValidate->fails()) {
-            return response()->json([
-                "errors" => $isValidate->errors()->all(),
-                "success" => false
-
-            ], 403);
-        }
-
-
-
-        $event = new Event();
-
-        if($request->files->has('image'))
+        if($request->hasFile('imagePost'))
         {
-            $images = $request->files->get('image');
-
-            // dd($images);
-
-           foreach( $images as $image)
-           {
-
-            print($images);
-
-            $image = $request->files->get('image');
-            $filename = time() . "." . $image->extension();
-            $image->move(public_path('/storage/'), $filename);
-
-               $event->eventid=$request->eventid;
-               $event->image=$filename;
-               $event->save();
-
-
-           }
-           return response()->json(["data" => $event]);
-
+            $imagePost = 'IMAGE-POST'.time().$request->file('imagePost')->getClientOriginalName();
+            // ec
+            $filee = $request->image;
+            $fileName = $filee->getClientOriginalName();
+            $filee->move('uploads/posts',$fileName);
+            $image = $fileName;
         }
+        $status = $request->input('status');
+        
+       
+    }
 
 
 
@@ -169,9 +134,7 @@ class EventController extends Controller
 
 
 
-
-
-        }
+        
 
 
 

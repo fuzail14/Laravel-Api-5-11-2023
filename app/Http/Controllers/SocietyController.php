@@ -79,21 +79,22 @@ class SocietyController extends Controller
     {
         $isValidate = Validator::make($request->all(), [
 
-            'country' => 'required',
+            // 'country' => 'required',
 
-            'state' => 'required',
+            // 'state' => 'required',
 
 
-            'city' => 'required',
-            'area' => 'required',
+            // 'city' => 'required',
+            // 'area' => 'required',
 
-            'type' => 'required',
+            // 'type' => 'required',
 
 
             'name' => 'required',
 
             'address' => 'required',
-            'id' => 'required|exists:societies,id',
+            // 'id' => 'required|exists:societies,id',
+            'id' => 'required',
 
 
         ]);
@@ -110,28 +111,28 @@ class SocietyController extends Controller
 
         $society = Society::find($request->id);
 
-        $society->country = $request->country;
+        // $society->country = $request->country;
 
-        $society->state = $request->state;
+        // $society->state = $request->state;
 
 
 
-        $society->city = $request->city;
-        $society->area = $request->area;
+        // $society->city = $request->city;
+        // $society->area = $request->area;
 
-        $society->type = $request->type;
+        // $society->type = $request->type;
 
 
 
         $society->name = $request->name;
 
         $society->address = $request->address;
-        $society->save();
+        $society->update();
 
 
         return response()->json([
             "success" => true,
-            "data" => $society,
+            
             "message" => "update successfully"
         ]);
     }
