@@ -75,7 +75,16 @@ class MarketPlaceController extends Controller
 
     public function viewProducts($societyid)
     {
-        $products = Marketplace::where('societyid', $societyid)->get();
+        $products = Marketplace::where('societyid', $societyid)->with('resident')->get();
+        return response()->json([
+            'success' => true,
+            'data' => $products
+        ]);
+    }
+
+    public function viewSellProductsResidnet($residentid)
+    {
+        $products = Marketplace::where('residentid', $residentid)->with('resident')->get();
         return response()->json([
             'success' => true,
             'data' => $products

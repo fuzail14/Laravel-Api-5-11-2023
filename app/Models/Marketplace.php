@@ -23,5 +23,10 @@ class Marketplace extends Model
     // {
     //     $this->attributes['images'] = json_encode($value);
     // }
+    public function resident()
+    {
+        return $this->hasMany('App\Models\User','id','residentid');
+    }
+    
 
 }
