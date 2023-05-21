@@ -24,6 +24,7 @@ return new class extends Migration
             $table->date('enddate');
             $table->integer('active');
             $table->timestamps();
+            
         });
     }
 

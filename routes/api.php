@@ -30,8 +30,11 @@ use App\Http\Controllers\LocalBuildingFloorController;
 use App\Http\Controllers\LocalBuildingApartmentController;
 use App\Http\Controllers\DiscussionRoomController;
 use App\Http\Controllers\DiscussionChatController;
+use App\Http\Controllers\EmergencyController;
 use App\Http\Controllers\VistorDetailController;
 use App\Http\Controllers\MarketPlaceController;
+
+
 
 
 use Illuminate\Support\Facades\Artisan;
@@ -246,6 +249,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('addProduct', [MarketPlaceController::class, 'addProduct']);
   Route::get('viewProducts/{societyid}', [MarketPlaceController::class, 'viewProducts']);
   Route::get('viewSellProductsResidnet/{residentid}', [MarketPlaceController::class, 'viewSellProductsResidnet']);
+
+
+  //Emergency
+  Route::post('addEmergency', [EmergencyController::class, 'addEmergency']);
 });
 
 
