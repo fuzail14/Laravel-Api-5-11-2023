@@ -46,50 +46,57 @@ class EmergencyController extends Controller
 
         $gatekeepers = Gatekeeper::where('subadminid', $request->subadminid)
             ->join('users', 'users.id', '=', 'gatekeepers.gatekeeperid')->get();
-        $fcm = ['fcmtoken'];
+        $fcm = [];
+
+        foreach ($gatekeepers as $datavals) {
+            array_push($fcm, $datavals->fcmtoken);
+        }
+
+        foreach ($subadmins as $datavals) {
+            array_push($fcm, $datavals->fcmtoken);
+        }
+
+        // foreach ($gatekeepers as $datavals) {
+
+        //     array_push($fcm, $datavals['fcmtoken']);
+        // }
 
 
+        $serverkey = 'AAAAcuxXPmA:APA91bEz-6ptcGS8KzmgmSLjb-6K_bva-so3i6Eyji_ihfncqXttVXjdBQoU6V8sKilzLb9MvSHFId-KK7idDwbGo8aXHpa_zjGpZuDpM67ICKM7QMCGUO_JFULTuZ_ApIOxdF3TXeDR';
+        $url = 'https://fcm.googleapis.com/fcm/send';
+        $mydata = [
+            'registration_ids' => $fcm,
 
-        // array_push($fcm, $subadmins['fcmtoken']);
+            "data" => ["type" => 'Emergency'],
+            "android" => [
+                "priority" => "high",
+                "ttl" => 60 * 60 * 1,
+                "android_channel_id" => "pushnotificationapp"
 
+            ],
+            "notification" => [
+                'problem' => $emergency->problem, 'body' => $emergency->problem,
 
+                'description' => $emergency->description,
+            ]
 
+        ];
+        $finaldata = json_encode($mydata);
+        $headers = array(
+            'Authorization: key=' . $serverkey,
+            'Content-Type: application/json'
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $finaldata);
+        $result = curl_exec($ch);
+        // var_dump($result);
+        curl_close($ch);
 
-
-        // $serverkey = 'AAAAcuxXPmA:APA91bEz-6ptcGS8KzmgmSLjb-6K_bva-so3i6Eyji_ihfncqXttVXjdBQoU6V8sKilzLb9MvSHFId-KK7idDwbGo8aXHpa_zjGpZuDpM67ICKM7QMCGUO_JFULTuZ_ApIOxdF3TXeDR';
-        // $url = 'https://fcm.googleapis.com/fcm/send';
-        // $mydata = [
-        //     'registration_ids' => $fcm,
-
-        //     "data" => ["type" => 'Emergency'],
-        //     "android" => [
-        //         "priority" => "high",
-        //         "ttl" => 60 * 60 * 1,
-        //         "android_channel_id" => "pushnotificationapp"
-
-        //     ],
-        //     "notification" => [
-        //         'Problem' => $emergency->problem, 'body' => $emergency->description,
-
-        //         'description' => "NA"
-        //     ]
-
-        // ];
-        // $finaldata = json_encode($mydata);
-        // $headers = array(
-        //     'Authorization: key=' . $serverkey,
-        //     'Content-Type: application/json'
-        // );
-        // $ch = curl_init();
-        // curl_setopt($ch, CURLOPT_URL, $url);
-        // curl_setopt($ch, CURLOPT_POST, true);
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, $finaldata);
-        // $result = curl_exec($ch);
-        // // var_dump($result);
-        // curl_close($ch);
 
 
 
