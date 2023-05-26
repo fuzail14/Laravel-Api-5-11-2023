@@ -253,6 +253,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
   //Emergency
   Route::post('addEmergency', [EmergencyController::class, 'addEmergency']);
+  Route::get('viewEmergency/{subadminid}', [EmergencyController::class, 'viewEmergency']);
 });
 
 

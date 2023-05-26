@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Chat;
 use App\Models\Gatekeeper;
 use App\Models\Resident;
@@ -32,14 +33,14 @@ class ChatController extends Controller
         }
 
         $chat = new Chat();
-        $chat->sender=$request->sender;
-        $chat->reciever=$request->reciever;
-        $chat->chatroomid=$request->chatroomid;
-        $chat->message=$request->message??'';
-        $chat->lastmessage=$request->lastmessage??'';
+        $chat->sender = $request->sender;
+        $chat->reciever = $request->reciever;
+        $chat->chatroomid = $request->chatroomid;
+        $chat->message = $request->message ?? '';
+        $chat->lastmessage = $request->lastmessage ?? '';
         $chat->save();
 
-        
+
 
 
         // event(new UserChat($chat));
@@ -47,12 +48,9 @@ class ChatController extends Controller
 
 
         return response()->json([
-            "success"=>true,
-            "data" => $chat]);
-
-
-
-
+            "success" => true,
+            "data" => $chat
+        ]);
     }
 
     public function viewconversationsneighbours($chatroomid)
@@ -60,42 +58,42 @@ class ChatController extends Controller
 
 
 
-        $cov=Chat::where('chatroomid',$chatroomid)->orderBy('created_at', 'desc')->get();
+        $cov = Chat::where('chatroomid', $chatroomid)->orderBy('created_at', 'desc')->get();
 
-        
+
 
 
         return response()->json([
-            "success"=>true,
-            "data" => $cov]);
-
-
-
-
+            "success" => true,
+            "data" => $cov
+        ]);
     }
 
 
     public function chatneighbours($subadminid)
     {
 
-       $chatneighbours=   Resident::where('subadminid', $subadminid)->where('status',1)->join('users', 'residents.residentid', '=', 'users.id')->get();
+        $chatneighbours =   Resident::where('subadminid', $subadminid)->where('status', 1)->join('users', 'residents.residentid', '=', 'users.id')->get();
 
         return
-        response()->json(["success"=>true,
-        "data" => $chatneighbours]);
-
+            response()->json([
+                "success" => true,
+                "data" => $chatneighbours
+            ]);
     }
 
 
     public function chatgatekeepers($subadminid)
     {
 
-        $chatgatekeepers= Gatekeeper::where('subadminid', $subadminid)->join('users', 'gatekeepers.gatekeeperid', '=', 'users.id')->get();
+        $chatgatekeepers = Gatekeeper::where('subadminid', $subadminid)->join('users', 'gatekeepers.gatekeeperid', '=', 'users.id')->get();
 
 
         return
-        response()->json(["success"=>true,
-        "data" => $chatgatekeepers]);
+            response()->json([
+                "success" => true,
+                "data" => $chatgatekeepers
+            ]);
     }
 
 
@@ -103,56 +101,52 @@ class ChatController extends Controller
     public function zegocall($residentid)
     {
 
-        $residents= Resident::where('residentid',$residentid)
-->join('users','users.id','=','residents.residentid')->get();
+        $residents = Resident::where('residentid', $residentid)
+            ->join('users', 'users.id', '=', 'residents.residentid')->get();
 
 
 
-$fcm=[];
+        $fcm = [];
 
-foreach ($residents as $datavals) {
+        foreach ($residents as $datavals) {
 
-    
-    array_push($fcm, $datavals['fcmtoken']);
 
-}
+            array_push($fcm, $datavals['fcmtoken']);
+        }
 
-      $serverkey='AAAAcuxXPmA:APA91bEz-6ptcGS8KzmgmSLjb-6K_bva-so3i6Eyji_ihfncqXttVXjdBQoU6V8sKilzLb9MvSHFId-KK7idDwbGo8aXHpa_zjGpZuDpM67ICKM7QMCGUO_JFULTuZ_ApIOxdF3TXeDR';
+        $serverkey = 'AAAAcuxXPmA:APA91bEz-6ptcGS8KzmgmSLjb-6K_bva-so3i6Eyji_ihfncqXttVXjdBQoU6V8sKilzLb9MvSHFId-KK7idDwbGo8aXHpa_zjGpZuDpM67ICKM7QMCGUO_JFULTuZ_ApIOxdF3TXeDR';
         $url = 'https://fcm.googleapis.com/fcm/send';
-        $mydata=['registration_ids'=>$fcm,
- 
-        // "data"=>["type"=>'Event'],
-        "android"=> [
-            "priority"=> "high",
-            "ttl"=> 60 * 60 * 1,
-            "android_channel_id"=>'call',
-            "channel_name"=>'call'
+        $mydata = [
+            'registration_ids' => $fcm,
 
-        ],
-        "notification"=>['title'=>'call','body'=>'calling',
-        
-     ]
+            // "data"=>["type"=>'Event'],
+            "android" => [
+                "priority" => "high",
+                "ttl" => 60 * 60 * 1,
+                "android_channel_id" => 'call',
+                "channel_name" => 'call'
 
-    ];
-    $finaldata=json_encode($mydata);
-        $headers = array (
+            ],
+            "notification" => [
+                'title' => 'call', 'body' => 'calling',
+
+            ]
+
+        ];
+        $finaldata = json_encode($mydata);
+        $headers = array(
             'Authorization: key=' . $serverkey,
             'Content-Type: application/json'
         );
-        $ch = curl_init ();
-        curl_setopt ( $ch, CURLOPT_URL, $url );
-        curl_setopt ( $ch, CURLOPT_POST, true );
-        curl_setopt ( $ch, CURLOPT_HTTPHEADER, $headers );
-        curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, true );
-        curl_setopt ( $ch, CURLOPT_SSL_VERIFYPEER, false );
-        curl_setopt ( $ch, CURLOPT_POSTFIELDS, $finaldata );
-        $result = curl_exec ( $ch );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $finaldata);
+        $result = curl_exec($ch);
         // var_dump($result);
-        curl_close ( $ch );
-
-        
+        curl_close($ch);
     }
-
-
-
 }

@@ -25,8 +25,10 @@ class Marketplace extends Model
     // }
     public function resident()
     {
-        return $this->hasMany('App\Models\User','id','residentid');
+        return $this->hasMany('App\Models\User', 'id', 'residentid');
     }
-    
-
+    public function residentdata()
+    {
+        return $this->hasMany('App\Models\Resident', 'residentid', 'residentid');
+    }
 }

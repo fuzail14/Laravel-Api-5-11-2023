@@ -17,4 +17,10 @@ class Emergency extends Model
         "status"
 
     ];
+
+
+    public function resident()
+    {
+        return $this->hasMany('App\Models\User', 'id', 'residentid');
+    }
 }

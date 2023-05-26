@@ -108,7 +108,12 @@ class EmergencyController extends Controller
         ]);
     }
 
-    public function viewEmergency()
+    public function viewEmergency($subadminid)
     {
+
+
+        $emergency = Emergency::where('subadminid', $subadminid)->orderBy('created_at', 'desc')->with('resident')->get();
+
+        return response()->json(["data" => $emergency]);
     }
 }
