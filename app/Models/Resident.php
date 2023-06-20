@@ -58,6 +58,13 @@ protected $primarykey='residentid';
         return $this->hasMany('App\Models\Property',"id",'propertyid');
     }
     
+
+    // public function societybuildingapartments()
+    // {
+    //     return $this->hasMany('App\Models\Societybuildingapartment',"id",'propertyid');
+    // }
+
+
     public function measurement()
     {
         return $this->hasMany('App\Models\Measurement',"id",'measurementid');

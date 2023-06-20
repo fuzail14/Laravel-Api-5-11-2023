@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Resident;
 use Illuminate\Http\Request;
 
 use App\Models\Marketplace;
@@ -75,20 +76,40 @@ class MarketPlaceController extends Controller
 
     public function viewProducts($societyid)
     {
-        $products = Marketplace::where('societyid', $societyid)
-            ->join('users', 'marketplaces.residentid', '=', 'users.id')->get();
+        $products = Marketplace::where('societyid', $societyid)->get();
+        return response()->json([
+            'success' => true,
+            'data' => $products
+        ]);
+
+
+    }
+
+    public function viewSellProductsResidnet($residentid)
+    {
+        $products = Marketplace::where('residentid', $residentid)
+        ->with('resident')
+        ->with('residentdata')->get();
         return response()->json([
             'success' => true,
             'data' => $products
         ]);
     }
 
-    public function viewSellProductsResidnet($residentid)
+
+
+
+    public function productSellerInfo($residentid)
     {
-        $products = Marketplace::where('residentid', $residentid)->with('resident')->with('residentdata')->get();
-        return response()->json([
-            'success' => true,
-            'data' => $products
-        ]);
+
+       $chatneighbours=   Resident::where('residentid', $residentid)
+       ->where('status',1)->join('users', 'residents.residentid', '=', 'users.id')
+       ->get();
+
+        return
+        response()->json(["success"=>true,
+        "data" => $chatneighbours]);
+
     }
+
 }

@@ -14,9 +14,6 @@ use App\Http\Controllers\PhaseController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\StreetController;
 use App\Http\Controllers\PropertyController;
-use App\Http\Controllers\FloorController;
-use App\Http\Controllers\ApartmentController;
-use App\Http\Controllers\BuildingResidentController;
 use App\Http\Controllers\FamilyMemberController;
 use App\Http\Controllers\ChatRoomController;
 use App\Http\Controllers\ChatRoomUserController;
@@ -30,14 +27,13 @@ use App\Http\Controllers\LocalBuildingFloorController;
 use App\Http\Controllers\LocalBuildingApartmentController;
 use App\Http\Controllers\DiscussionRoomController;
 use App\Http\Controllers\DiscussionChatController;
-use App\Http\Controllers\EmergencyController;
 use App\Http\Controllers\VistorDetailController;
 use App\Http\Controllers\MarketPlaceController;
+use App\Http\Controllers\EmergencyController;
+use App\Http\Controllers\FinanceManagerController;
 
 
 
-
-use Illuminate\Support\Facades\Artisan;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -188,10 +184,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
   //Chatroom
   Route::post('createchatroom', [ChatRoomController::class, 'createchatroom']);
+  Route::get('fetch-chat-room/{userid}/{chatuserid}', [ChatRoomController::class, 'fetchChatRoom']);
 
 
-  //Chatroomuser
-  //    fetchchatroomusers
 
   Route::get('fetchchatroomusers/{userid}/{chatuserid}', [ChatRoomUserController::class, 'fetchchatroomusers']);
 
@@ -210,10 +205,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('housesapartmentmeasurements/{subadminid}/{type}', [MeasurementController::class, 'housesapartmentmeasurements']);
 
   //Bills
-  Route::post('generatebill', [BillController::class, 'generatebill']);
+  Route::post('generatehousebill', [BillController::class, 'generatehousebill']);
+  Route::post('generatesocietyapartmentbill', [BillController::class, 'generatesocietyapartmentbill']);
   Route::post('monthlybillupdateoverduedatestatus', [BillController::class, 'monthlybillupdateoverduedatestatus']);
 
-  Route::get('generatedbill/{subadminid}', [BillController::class, 'generatedbill']);
+  Route::get('generatedhousebill/{subadminid}', [BillController::class, 'generatedhousebill']);
+  Route::get('generatedsocietyapartmentbill/{subadminid}', [BillController::class, 'generatedsocietyapartmentbill']);
   Route::get('monthlybills/{residenid}', [BillController::class, 'monthlybills']);
   Route::get('paybill/{id}', [BillController::class, 'paybill']);
 
@@ -248,12 +245,22 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
   Route::post('addProduct', [MarketPlaceController::class, 'addProduct']);
   Route::get('viewProducts/{societyid}', [MarketPlaceController::class, 'viewProducts']);
+  Route::get('product-seller-info/{residentid}', [MarketPlaceController::class, 'productSellerInfo']);
   Route::get('viewSellProductsResidnet/{residentid}', [MarketPlaceController::class, 'viewSellProductsResidnet']);
-
 
   //Emergency
   Route::post('addEmergency', [EmergencyController::class, 'addEmergency']);
   Route::get('viewEmergency/{subadminid}', [EmergencyController::class, 'viewEmergency']);
+
+// Finance Managers
+
+
+Route::post('finance-manager/register', [FinanceManagerController::class, 'register']);
+Route::get('finance-manager/view/{id}', [FinanceManagerController::class, 'view']);
+Route::get('finance-manager/delete/{id}', [FinanceManagerController::class, 'delete']);
+Route::post('finance-manager/update', [FinanceManagerController::class, 'update']);
+Route::get('finance-manager/bills/current-month-bills/{subadminid}', [FinanceManagerController::class, 'currentMonthBills']);
+
 });
 
 

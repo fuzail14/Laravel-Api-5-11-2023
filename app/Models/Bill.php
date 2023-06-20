@@ -49,5 +49,9 @@ class Bill extends Model
     }
 
 
+    public function societybuildingapartments()
+    {
+        return $this->hasMany('App\Models\Societybuildingapartment',"id",'societybuildingapartmentid');
+    }
 
 }

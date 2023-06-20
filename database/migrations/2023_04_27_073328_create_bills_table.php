@@ -19,7 +19,6 @@ class CreateBillsTable extends Migration
         Schema::create('bills', function (Blueprint $table) {
             $table->id();
             $table->decimal('charges');
-            $table->decimal('chargesafterduedate');
             $table->decimal('latecharges');
             $table->decimal('appcharges');
             $table->decimal('tax');
@@ -28,15 +27,17 @@ class CreateBillsTable extends Migration
             $table->unsignedBigInteger('subadminid');
             $table->foreign('subadminid')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('residentid');
-            // $table->foreign('residentid')->references('id')->on('residents')->onDelete('cascade');
+            $table->foreign('residentid')->references('residentid')->on('residents')->onDelete('cascade');
             $table->unsignedBigInteger('propertyid');
-            $table->foreign('propertyid')->references('id')->on('properties')->onDelete('cascade');
+            // $table->foreign('propertyid')->references('id')->on('properties')->onDelete('cascade');
             $table->unsignedBigInteger('measurementid');
             $table->foreign('measurementid')->references('id')->on('measurements')->onDelete('cascade');
             $table->date('duedate');
             $table->date('billstartdate');
             $table->date('billenddate');
             $table->string('month');
+            $table->string('billtype');
+            $table->string('paymenttype');
             $table->integer('status');
             $table->integer('isbilllate')->default(0);
             $table->integer('noofappusers');

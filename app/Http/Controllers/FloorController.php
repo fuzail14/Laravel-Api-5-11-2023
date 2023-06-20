@@ -21,8 +21,8 @@ class FloorController extends Controller
             'subadminid' => 'required|exists:users,id',
             'buildingid' => 'required|exists:societies,id',
 
-            'from' => 'required|integer',
-            'to' => 'required|integer',
+            'from' => 'required|integer|gt:0',
+            'to' => 'required|integer|gt:from',
 
         ]);
         if ($isValidate->fails()) {

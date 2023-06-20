@@ -26,9 +26,6 @@ class Subadmin extends Model
         'remember_token',
     ];
 
-    public function societydata()
-    {
-        return $this->hasMany('App\Models\Subadmin', 'subadminid', 'subadminid');
-    }
+    
 
 }

@@ -19,7 +19,7 @@ class PropertyController extends Controller
             'societyid' => 'required|exists:societies,id',
             'superadminid' => 'required|exists:users,id',
             'address' => 'required',
-            'from' => 'required|integer',
+            'from' => 'required|integer|gt:0',
             'to' => 'required|integer|gt:from',
             'dynamicid' => 'required',
             'type' => 'required',

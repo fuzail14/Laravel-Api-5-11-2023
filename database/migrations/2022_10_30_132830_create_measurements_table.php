@@ -20,12 +20,10 @@ class CreateMeasurementsTable extends Migration
             $table->string('type');
             $table->string('unit');
             $table->decimal('charges');
-            $table->decimal('chargesafterduedate');
             $table->decimal('latecharges');
             $table->decimal('appcharges');
             $table->decimal('tax');
             $table->decimal('area');
-            $table->integer('bedrooms');
             $table->integer('status');
             $table->timestamps();
         });

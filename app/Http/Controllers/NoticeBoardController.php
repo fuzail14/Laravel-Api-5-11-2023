@@ -61,7 +61,8 @@ class NoticeBoardController extends Controller
         ],
         "notification"=>['title'=>$notice->noticetitle,'body'=>$notice->noticedetail,
         
-        'description'=>"jani"]
+        
+        ]
 
     ];
     $finaldata=json_encode($mydata);

@@ -18,8 +18,8 @@ class ApartmentController extends Controller
 
         $isValidate = Validator::make($request->all(), [
             'fid' => 'required|exists:floors,id',
-            'from' => 'required|integer',
-            'to' => 'required|integer',
+            'from' => 'required|integer|gt:0',
+            'to' => 'required|integer|gt:from',
         ]);
 
         if ($isValidate->fails()) {

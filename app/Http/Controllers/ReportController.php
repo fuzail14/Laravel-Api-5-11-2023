@@ -54,7 +54,7 @@ class ReportController extends Controller
                 $url = 'https://fcm.googleapis.com/fcm/send';
                 $mydata=['registration_ids'=>$fcm,
          
-                "data"=>["type"=>'Event'],
+                "data"=>["type"=>'ReportNotification'],
                 "android"=> [
                     "priority"=> "high",
                     "ttl"=> 60 * 60 * 1,
@@ -64,7 +64,7 @@ class ReportController extends Controller
                 ],
                 "notification"=>['title'=>$report->title,'body'=>$report->description,
                 
-                'description'=>"jani"]
+                ]
         
             ];
             $finaldata=json_encode($mydata);
@@ -144,6 +144,7 @@ class ReportController extends Controller
 
          $notificationtext="";
           $fcm=[];
+          $isRejected=false;
          if($report->status ==2)
 
          { $residents= User::where('id',$request->userid)->get();
@@ -170,8 +171,29 @@ class ReportController extends Controller
         
         }
         
+        
         }
         
+
+        else   if($report->status ==3)
+
+        {
+            $isRejected=true;
+
+             $residents= User::where('id', $report->userid)->get();
+           $res = Resident::where('residentid', $request->userid)->first();
+
+
+           $notificationtext="The complaint rejected 🔴 Reason : $report->statusdescription ";
+           foreach ($residents as $datavals) {
+       
+           array_push($fcm, $datavals['fcmtoken']);
+       
+       }
+       
+       
+       }
+       
         
        
         
@@ -181,7 +203,7 @@ class ReportController extends Controller
                 $url = 'https://fcm.googleapis.com/fcm/send';
                 $mydata=['registration_ids'=>$fcm,
          
-                // "data"=>["type"=>'Event'],
+                "data"=>["type"=>$isRejected?'ReportHistory' : 'Report'],
                 "android"=> [
                     "priority"=> "high",
                     "ttl"=> 60 * 60 * 1,

@@ -11,6 +11,8 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $primaryKey="id";
+
 
     public function getResidentData()
 
@@ -45,6 +47,7 @@ class User extends Authenticatable
     protected $hidden = [
         // 'password',
         'remember_token',
+        'password'
     ];
 
     /**
@@ -66,5 +69,35 @@ class User extends Authenticatable
  
          return $this->hasMany('App\Models\Resident',"residentid",'residentid');
      }
+
+
+    
+     public function subadmin()
+     {
+ 
+ 
+         return $this->hasOne('App\Models\User',"id",'subadminid');
+     }
+
+     public function superadmin()
+     {
+ 
+ 
+         return $this->hasOne('App\Models\User',"id",'superadminid');
+     }
+
+
+
+
+     public function society()
+     {
+ 
+ 
+         return $this->hasOne('App\Models\Society',"id",'societyid');
+     }
+
+
+
+
  
 }

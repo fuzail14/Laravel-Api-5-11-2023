@@ -31,4 +31,5 @@ class Marketplace extends Model
     {
         return $this->hasMany('App\Models\Resident', 'residentid', 'residentid');
     }
+
 }

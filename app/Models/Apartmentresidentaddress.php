@@ -58,5 +58,9 @@ class Apartmentresidentaddress extends Model
         return $this->hasMany('App\Models\Measurement',"id",'measurementid');
 
     }
+    public function societybuildingapartments()
+    {
+        return $this->hasMany('App\Models\Societybuildingapartment',"id",'societybuildingapartmentid');
+    }
 
 }

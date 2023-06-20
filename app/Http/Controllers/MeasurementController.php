@@ -13,12 +13,10 @@ class MeasurementController extends Controller
             'type' => 'required|string',
             'unit' => 'required|string',
             'charges' => 'required',
-            'chargesafterduedate' => 'required',
             'latecharges' => 'required',
             'appcharges' => 'required',
             'tax' => 'required',
             'area' => 'required',
-            'bedrooms' => 'nullable',
             'status' => 'nullable',
             'subadminid' => 'required|exists:users,id',
         ]);
@@ -33,10 +31,8 @@ class MeasurementController extends Controller
         $measurement->unit = $request->unit;
         $measurement->charges = $request->charges;
         $measurement->area = $request->area;
-        $measurement->bedrooms = $request->bedrooms??0;
         $measurement->status = $request->status??0;
         $measurement->subadminid = $request->subadminid;
-        $measurement->chargesafterduedate = $request->chargesafterduedate;
         $measurement->appcharges = $request->appcharges;
         $measurement->latecharges = $request->latecharges;
         $measurement->tax = $request->tax;

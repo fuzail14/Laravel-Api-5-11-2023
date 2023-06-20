@@ -67,7 +67,7 @@ class EmergencyController extends Controller
         $mydata = [
             'registration_ids' => $fcm,
 
-            "data" => ["type" => 'Emergency'],
+            "data" => ["type" => 'Emergency','id'=>$emergency->id],
             "android" => [
                 "priority" => "high",
                 "ttl" => 60 * 60 * 1,
@@ -75,9 +75,8 @@ class EmergencyController extends Controller
 
             ],
             "notification" => [
-                'problem' => $emergency->problem, 'body' => $emergency->problem,
-
-                'description' => $emergency->description,
+                'title' => $emergency->problem, 
+                'body' => $emergency->description,
             ]
 
         ];
