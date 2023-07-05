@@ -30,8 +30,8 @@ class SocietyController extends Controller
             'name' => 'required',
             'address' => 'required',
             'superadminid' => 'required|exists:users,id',
-            'structuretype'=>'required'
-    
+            'structuretype' => 'required'
+
 
 
         ]);
@@ -132,7 +132,7 @@ class SocietyController extends Controller
 
         return response()->json([
             "success" => true,
-            
+
             "message" => "update successfully"
         ]);
     }
@@ -141,7 +141,7 @@ class SocietyController extends Controller
 
     {
 
-      
+
         $society = Society::where('superadminid', $superadminid)->get();
 
 
@@ -172,37 +172,103 @@ class SocietyController extends Controller
     public function viewsocietiesforresidents($type)
     {
 
-    //   $society=  Society::where('type',$type)->get();
+        //   $society=  Society::where('type',$type)->get();
 
-           $society = collect( Society::join('subadmins', function($join) use($type){
+        $society = collect(Society::join('subadmins', function ($join) use ($type) {
 
             $join->on('societies.id', '=', 'subadmins.societyid')
-                 ->where('societies.type', '=', $type);
+                ->where('societies.type', '=', $type);
         })->select('societies.*', 'subadmins.subadminid')
-       ->get());
+            ->get());
 
-       
-        return response()->json(["data" => $society]);
-    }
-
-   
-
-
-    public function    searchsociety($q)
-    {
-
-
-        $society = Society::where('name', 'LIKE', '%' . $q . '%')->orWhere('address', 'LIKE', '%' . $q . '%')->get();
 
         return response()->json(["data" => $society]);
     }
 
-    public function filtersocietybuilding($id, $q)
+
+
+
+    public function searchsociety($q, $superadminid = null)
     {
+        $society = Society::where(function ($query) use ($q) {
+            $query->where('name', 'LIKE', '%' . $q . '%')
+                ->orWhere('address', 'LIKE', '%' . $q . '%');
+        })
+            ->leftJoin('subadmins', 'societies.id', '=', 'subadmins.societyid')
+            ->whereNotNull('subadmins.subadminid');
+
+        if ($superadminid !== null) {
+            $society->where('societies.superadminid', $superadminid);
+        }
+
+        $society = $society->get();
+
+        if ($society->isEmpty()) {
+            return response()->json(["message" => "No community found matching the search query or filters."]);
+        }
+
+        $result = [];
+
+        foreach ($society as $societyData) {
+            $result[] = [
+                "societydata" => $societyData,
+                "message" => "success."
+
+            ];
+        }
+
+        return response()->json(["socitiesdata" => $result]);
+    }
 
 
-        $society = Society::where('superadminid', $id)->where('type', 'LIKE', '%' . $q . '%')->get();
+    public function filtersocietybuilding($id, $type)
+    {
+        $society = Society::where('societies.superadminid', $id)
+            ->where('societies.type', 'LIKE', '%' . $type . '%')
+            ->leftJoin('subadmins', 'societies.id', '=', 'subadmins.societyid')
+            ->whereNotNull('subadmins.subadminid')
+            ->get();
 
-        return response()->json(["data" => $society]);
+        if ($society->isEmpty()) {
+            return response()->json(["message" => "No community found."]);
+        }
+
+        $result = [];
+
+        foreach ($society as $societyData) {
+            $result[] = [
+                "societydata" => $societyData,
+                "message" => "Success."
+            ];
+        }
+
+        return response()->json(["socitiesdata" => $result]);
+    }
+
+
+
+
+    public function allSocities($superadminid)
+    {
+        $society = Society::where('societies.superadminid', $superadminid)
+            ->join('subadmins', 'societies.id', '=', 'subadmins.societyid')
+            ->whereNotNull('subadmins.subadminid')
+            ->get();
+
+        if ($society->isEmpty()) {
+
+            return response()->json(["message" => "No community found."]);
+        }
+
+        $result = [];
+
+        foreach ($society as $societyData) {
+            $result[] = [
+                "societydata" => $societyData,
+                "message" => "Success."
+            ];
+        }
+
+        return response()->json(["socitiesdata" => $result]);
     }
 }

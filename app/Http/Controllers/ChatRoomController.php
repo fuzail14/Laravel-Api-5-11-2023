@@ -91,7 +91,7 @@ public function fetchChatRoom($userid,$chatuserid)
 
         $cov=Chatroom::where('loginuserid',$userid)
         ->where('chatuserid',$chatuserid)
-        ->first()??Chatroomuser::where('loginuserid',$chatuserid)
+        ->first()??Chatroom::where('loginuserid',$chatuserid)
         ->where('chatuserid',$userid)->first();
 
 

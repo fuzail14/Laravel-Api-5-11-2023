@@ -106,23 +106,30 @@ class EventController extends Controller
     }
 
 
+   
+
+
+    
     public function addeventimages(Request $request)
     {
-        if($request->hasFile('imagePost'))
-        {
-            $imagePost = 'IMAGE-POST'.time().$request->file('imagePost')->getClientOriginalName();
-            // ec
-            $filee = $request->image;
-            $fileName = $filee->getClientOriginalName();
-            $filee->move('uploads/posts',$fileName);
-            $image = $fileName;
+        if ($request->hasFile('images')) {
+
+            $images = $request->file('images');
+            
+            dd($images);
+
+            foreach ($images as $image) {
+                dd("sj");
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('uploads'), $imageName);
+                // You can also store the image path in your database if needed.
+            }
+
+            return response()->json([
+                "success"=>true,
+              "message"=>"event upload image successfully"]);
         }
-        $status = $request->input('status');
-        
-       
     }
-
-
 
 
 

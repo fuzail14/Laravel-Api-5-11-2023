@@ -31,6 +31,9 @@ use App\Http\Controllers\VistorDetailController;
 use App\Http\Controllers\MarketPlaceController;
 use App\Http\Controllers\EmergencyController;
 use App\Http\Controllers\FinanceManagerController;
+use App\Http\Controllers\SuperAdminFinanceManagerController;
+
+
 
 
 
@@ -48,6 +51,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('society/searchsociety/{q?}', [SocietyController::class, 'searchsociety']);
   Route::get('society/filtersocietybuilding/{id}/{q?}', [SocietyController::class, 'filtersocietybuilding']);
   Route::get('society/viewsocietiesforresidents/{type?}', [SocietyController::class, 'viewsocietiesforresidents']);
+  Route::get('society/allSocities/{superadminid}', [SocietyController::class, 'allSocities']);
   // Route::get('society/viewbuildingsforresidents', [SocietyController::class, 'viewbuildingsforresidents']);
   //User
   Route::post('logout', [RoleController::class, 'logout']);
@@ -212,7 +216,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('generatedhousebill/{subadminid}', [BillController::class, 'generatedhousebill']);
   Route::get('generatedsocietyapartmentbill/{subadminid}', [BillController::class, 'generatedsocietyapartmentbill']);
   Route::get('monthlybills/{residenid}', [BillController::class, 'monthlybills']);
-  Route::get('paybill/{id}', [BillController::class, 'paybill']);
+  Route::post('paybill', [BillController::class, 'paybill']);
 
 
 
@@ -252,15 +256,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('addEmergency', [EmergencyController::class, 'addEmergency']);
   Route::get('viewEmergency/{subadminid}', [EmergencyController::class, 'viewEmergency']);
 
-// Finance Managers
+  // Finance Managers
 
 
-Route::post('finance-manager/register', [FinanceManagerController::class, 'register']);
-Route::get('finance-manager/view/{id}', [FinanceManagerController::class, 'view']);
-Route::get('finance-manager/delete/{id}', [FinanceManagerController::class, 'delete']);
-Route::post('finance-manager/update', [FinanceManagerController::class, 'update']);
-Route::get('finance-manager/bills/current-month-bills/{subadminid}', [FinanceManagerController::class, 'currentMonthBills']);
+  Route::post('finance-manager/register', [FinanceManagerController::class, 'register']);
+  Route::get('finance-manager/view/{id}', [FinanceManagerController::class, 'view']);
+  Route::get('finance-manager/delete/{id}', [FinanceManagerController::class, 'delete']);
+  Route::post('finance-manager/update', [FinanceManagerController::class, 'update']);
+  Route::get('finance-manager/bills/current-month-bills/{subadminid}/{financemanagerid}', [FinanceManagerController::class, 'currentMonthBills']);
+  Route::get('finance-manager/bills/filter-bills/', [FinanceManagerController::class, 'filterBills']);
+  Route::post('finance-manager/bills/search', [FinanceManagerController::class, 'billSearch']);
 
+
+
+  //Super Admin Finance Managers
+
+  Route::post('superadmin-finance-manager/superAdminFinanceMangerRegister', [SuperAdminFinanceManagerController::class, 'superAdminFinanceMangerRegister']);
+  Route::get('finance-manager/view/{id}', [FinanceManagerController::class, 'view']);
+  Route::get('finance-manager/delete/{id}', [FinanceManagerController::class, 'delete']);
+  Route::post('finance-manager/update', [FinanceManagerController::class, 'update']);
 });
 
 

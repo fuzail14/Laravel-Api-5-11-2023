@@ -95,7 +95,12 @@ class NoticeBoardController extends Controller
     public function viewallnotices($subadminid)
     {
         $notice = Notice::where('subadminid', $subadminid)->get();
-        return response()->json(["data" => $notice]);
+        return response()->json([
+            "success"=>true,
+            "data" => $notice,
+        
+
+    ]);
     }
     public function deletenotice($id)
     {

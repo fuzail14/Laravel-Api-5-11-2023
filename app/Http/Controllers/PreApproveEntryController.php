@@ -13,7 +13,7 @@ class PreApproveEntryController extends Controller
     public function addpreapproventry(Request $request)
     {
         $isValidate = Validator::make($request->all(), [
-            'gatekeeperid' => 'required|exists:users,id',
+            'gatekeeperid' => 'required|exists:gatekeepers,gatekeeperid',
             'userid' => 'required|exists:users,id',
             'visitortype' => 'required',
             'name' => 'required',
@@ -47,7 +47,7 @@ class PreApproveEntryController extends Controller
         $preapprovedentry->description=$request->description??"";
         $preapprovedentry->cnic=$request->cnic??"";
         $preapprovedentry->mobileno=$request->mobileno;
-        $preapprovedentry->vechileno=$request->vechileno;
+        $preapprovedentry->vechileno=$request->vechileno??"";
         $preapprovedentry->arrivaldate=  Carbon::parse($request->arrivaldate)->format('y-m-d');
         $preapprovedentry->arrivaltime=$request->arrivaltime;
         $preapprovedentry->status=$request->status;
@@ -71,6 +71,8 @@ class PreApproveEntryController extends Controller
     {
        
 
+        $userid= $request->input('userid');
+        $q= rawurldecode( $request->input('search'));
 
         
         $isValidate = Validator::make($request->all(), [
@@ -79,7 +81,6 @@ class PreApproveEntryController extends Controller
           
 
         ]);
-$q=$request->searchquery;
         if ($isValidate->fails()) {
             return response()->json([
                 "errors" => $isValidate->errors()->all(),
@@ -90,19 +91,18 @@ $q=$request->searchquery;
 
        
 
-        $preapproveentry = Preapproveentry::
-        orWhere('name', 'LIKE', '%' . $q . '%')
-        ->orWhere('mobileno', 'LIKE', '%' . $q . '%')
-        ->orWhere('vechileno', 'LIKE', '%' . $q . '%')
-        ->orWhere('visitortype', 'LIKE', '%'. $q. '%')
+        
+        $preapproveentry = Preapproveentry::where('userid',$userid)->
+        where('name', 'LIKE', '%' . $q . '%')
+        // ->orWhere('mobileno', 'LIKE', '%' . $q . '%')
+        // ->orWhere('vechileno', 'LIKE', '%' . $q . '%')
+        // ->orWhere('visitortype', 'LIKE', '%'. $q. '%')
         ->get();
         
 
-       $s= $preapproveentry->where('userid',$request->userid);
-       if ($q=='')
-       {}
+      
 
-        return response()->json(["data" => $s]);
+        return response()->json(["data" => $preapproveentry]);
     }
 
 

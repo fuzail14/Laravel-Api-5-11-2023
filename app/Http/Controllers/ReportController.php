@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
 // 0=> pending
-        // 1=> in progress
+        // 2=> in progress
         // 3=> rejected
         // 4=> completed
 class ReportController extends Controller
@@ -107,7 +107,7 @@ class ReportController extends Controller
     }
     public function adminreports($residentid)
     {
-        $report = Report::where('userid', $residentid)->where('status','!=',3)->where('status' ,'!=' , 4)->orderByDesc('created_at')->get();
+        $report = Report::where('userid', $residentid)->where('status','!=',3)->where('status' ,'!=' , 4)->orderByDesc('updated_at')->get();
         return response()->json([
             "success" => true,
             "data" => $report,
@@ -136,7 +136,6 @@ class ReportController extends Controller
         }
         $report = Report::Find($request->id);
         $report->status = $request->status;
-        $report->updated_at = Carbon::now()->toDateTimeString();
         $report->statusdescription = $request->statusdescription;
         $report->update();
 
@@ -302,7 +301,9 @@ class ReportController extends Controller
     }
     public function historyreports($subadminid, $userid)
     {   
-        $reports =  Report::where('subadminid', $subadminid)->where('userid', $userid)->whereIn('status', [3, 4])->GET();
+        
+        $reports =  Report::where('subadminid', $subadminid)->where('userid', $userid)->whereIn('status', [3, 4])->orderByDesc('updated_at')->get();
+        
         return response()->json([
             "success" => true,
             "data" => $reports

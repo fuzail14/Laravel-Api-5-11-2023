@@ -26,10 +26,11 @@ class BillController extends Controller
         $isValidate = Validator::make($request->all(), [
 
             'subadminid' => 'required|exists:users,id',
+            'financemanagerid' => 'required|exists:financemanagers,financemanagerid',
             'duedate' => 'required|date|after:billenddate',
             'billstartdate' => 'required|date',
             'billenddate' => 'required|date|after:billstartdate',
-            'status' => 'required'
+            'status' => 'required|in:paid,unpaid,partiallypaid',
         ]);
 
 
@@ -55,13 +56,15 @@ class BillController extends Controller
         $billenddate = null;
         $getmonth = null;
         $month = null;
-        $status = 0;
+        $status = null;
         $previousPayableAmount=0.0;
         $previousBalance=0.0;
         $billType='house';
-        $paymentType='N/A';
-        
+        $paymentType='NA';
+        $totalPaidAmount=0.0;
         $subadminid = $request->subadminid;
+        $financemanagerid = $request->financemanagerid;
+
         $status = $request->status;
         $duedate = $request->duedate;
         $billstartdate = $request->billstartdate;
@@ -136,7 +139,7 @@ class BillController extends Controller
                     if ($firstDate->year === $secondDate->year && $firstDate->month === $secondDate->month) {
 
 
-                        return response()->json(['message' => 'the bill of this month is already generated !.'], 400);
+                        return response()->json(['message' => 'the bill of this month is already generated !.']);
 
                     }
 
@@ -147,7 +150,7 @@ class BillController extends Controller
             }
             
             $previousBill = Bill::where('residentid', $residnentid)->where('subadminid',$subadminid)
-                ->whereIn('status', [0, 1])->whereIn('isbilllate', [0, 1])->GET();
+                ->whereIn('status', ['paid', 'unpaid'])->whereIn('isbilllate', [0, 1])->GET();
             if(!empty($previousBill[0]->id))
             {
                 foreach ($previousBill as $previousBill)
@@ -175,6 +178,7 @@ class BillController extends Controller
                         'payableamount' => $payableamount + $previousPayableAmount,
                         'balance' => $balance+ $previousBalance ,
                         'subadminid' => $subadminid,
+                        'financemanagerid' =>$financemanagerid,
                         'residentid' => $residnentid,
                         'propertyid' => $propertyid,
                         'measurementid' => $measurementid,
@@ -187,7 +191,8 @@ class BillController extends Controller
                         'updated_at' => date('Y-m-d H:i:s'),
                         'noofappusers' => $noOfAppUsers,
                         'billtype'=>$billType,
-                        'paymenttype'=>$paymentType
+                        'paymenttype'=>$paymentType,
+                        'totalpaidamount'=>$totalPaidAmount
                     ],
 
                 ]
@@ -217,20 +222,6 @@ class BillController extends Controller
     public function generatedhousebill($subadminid)
     {
 
-        // $bills =  Bill::where('subadminid', $subadminid) ->join('users', 'users.id', '=', 'bills.residentid')
-        // ->select(
-
-        //     'users.rolename',
-        //     'bills.*',
-        //     'users.firstname', 
-        //     'users.lastname',
-        //      'users.image',
-        //     'users.cnic',
-        //     'users.roleid',
-
-
-
-        //     )->get();
 
 
         $currentDate = date('Y-m-d');
@@ -242,7 +233,7 @@ class BillController extends Controller
             'billenddate',
             $currentYear
         )
-        ->whereIn('status',[0,1])
+     
             ->with('user')
             ->with('resident')
             ->with('measurement')
@@ -269,10 +260,11 @@ class BillController extends Controller
         $isValidate = Validator::make($request->all(), [
 
             'subadminid' => 'required|exists:users,id',
+            'financemanagerid' => 'required|exists:financemanagers,financemanagerid',
             'duedate' => 'required|date|after:billenddate',
             'billstartdate' => 'required|date',
             'billenddate' => 'required|date|after:billstartdate',
-            'status' => 'required'
+            'status' => 'required|in:paid,unpaid,partiallypaid',
         ]);
 
 
@@ -298,16 +290,19 @@ class BillController extends Controller
         $billenddate = null;
         $getmonth = null;
         $month = null;
-        $status = 0;
+        $status = null;
         $previousPayableAmount=0.0;
         $previousBalance=0.0;
+        $totalPaidAmount=0.0;
+
         $subadminid = $request->subadminid;
+        $financemanagerid = $request->financemanagerid;
         $status = $request->status;
         $duedate = $request->duedate;
         $billstartdate = $request->billstartdate;
         $billenddate = $request->billenddate;
         $billType='societybuildingapartment';
-        $paymentType='N/A';
+        $paymentType='NA';
 
         $residents = Resident::where('subadminid', $subadminid)
         ->where('status', 1)
@@ -378,7 +373,7 @@ class BillController extends Controller
                     if ($firstDate->year === $secondDate->year && $firstDate->month === $secondDate->month) {
 
 
-                        return response()->json(['message' => 'the bill of this month is already generated !.'], 400);
+                        return response()->json(['message' => 'the bill of this month is already generated !.']);
 
                     }
 
@@ -389,7 +384,7 @@ class BillController extends Controller
             }
             
             $previousBill = Bill::where('residentid', $residnentid)->where('subadminid',$subadminid)
-                ->whereIn('status', [0, 1])->whereIn('isbilllate', [0, 1])->GET();
+                ->whereIn('status', ['paid','unpaid'])->whereIn('isbilllate', [0, 1])->GET();
             if(!empty($previousBill[0]->id))
             {
                 foreach ($previousBill as $previousBill)
@@ -417,6 +412,7 @@ class BillController extends Controller
                         'payableamount' => $payableamount + $previousPayableAmount,
                         'balance' => $balance+ $previousBalance ,
                         'subadminid' => $subadminid,
+                        'financemanagerid' =>$financemanagerid,
                         'residentid' => $residnentid,
                         'propertyid' => $propertyid,
                         'measurementid' => $measurementid,
@@ -429,7 +425,9 @@ class BillController extends Controller
                         'updated_at' => date('Y-m-d H:i:s'),
                         'noofappusers' => $noOfAppUsers,
                         'billtype'=>$billType,
-                        'paymenttype'=>$paymentType
+                        'paymenttype'=>$paymentType,
+                        'totalpaidamount'=>$totalPaidAmount
+
                     ],
 
                 ]
@@ -482,7 +480,7 @@ class BillController extends Controller
             'billenddate',
             $currentYear
         )
-        ->whereIn('status',[0,1])
+       
             ->with('user')
             ->with('resident')
             ->with('measurement')
@@ -515,7 +513,7 @@ class BillController extends Controller
                 'billenddate',
                 $currentYear
             )
-            ->where('status', 0)->get()->first();
+            ->where('status', 'unpaid')->get()->first();
 
 
 
@@ -528,108 +526,75 @@ class BillController extends Controller
     }
 
 
-   public function monthlybillupdateoverduedatestatus(Request $request)
-
-
-   {
-
-    
-
-    $isValidate = Validator::make($request->all(), [
-
-        'id' => 'required|exists:bills,id',
-        // 'payableamount' => 'required',
-    ]);
-
-
-    if ($isValidate->fails()) {
-        return response()->json([
-            "errors" => $isValidate->errors()->all(),
-            "success" => false
-        ], 403);
-    }
-
-
-    $bill = Bill::find($request->id);
-
-  
-
-
-          
-            //     $currentDate = strtotime("2023-09-15");
-                // $currentDate =  strtotime(date('Y-m-d'));
-                // $billDueDate= strtotime( $request->duedate);
-                // $payableAmount=$request->payableamount;
-
-
-
-
-                // if ($currentDate > $billDueDate) {
-            
-                //     $bill->isbilllate = 1;
-                //     $bill->payableamount = $payableAmount;
-                //     $bill->balance = $payableAmount;
-                //     $bill->update();
-
-
-
-                // }
-
-
-                // $currentDate =  strtotime(date('Y-m-d'));
-                // $billDueDate= strtotime( $request->duedate);
-                $payableAmount= $bill->payableamount;
-                $lateCharges= $bill->latecharges;
-                $amount=$payableAmount+$lateCharges;
-
-
-            
-                    $bill->isbilllate = 1;
-                    $bill->payableamount = $amount;
-                    $bill->balance = $amount;
-                    $bill->update();
-
-            
-
-
-                return response()->json([
-                    "success" => true,
-                    "message" => 'Bill status updated Successfully !'
-                ]);
-
-
-   }
-
 
 
 
     
 
 
-    public function paybill($id)
+    public function paybill(Request $request)
     {
 
 
-        $bill=Bill::find($id);
-        $billPaidStatus=1;
-        $payableAmount=0.0;
+        $isValidate = Validator::make($request->all(), [
+
+            'id' => 'required|exists:bills,id',
+            'paymenttype' => 'required',
+            'totalpaidamount' => 'required',
+        ]);
+    
+    
+        if ($isValidate->fails()) {
+            return response()->json([
+                "errors" => $isValidate->errors()->all(),
+                "success" => false
+            ], 403);
+        }
+    
+        $id=$request->id;
+        $paymentType=$request->paymenttype;
+        $totalPaidAmount=$request->totalpaidamount;
+        $billPaidStatus='paid';
         $balance=0.0;
         $amount=0.0;
+        
 
+
+       
+        
+
+        $bill=Bill::find($id);
+
+
+
+        if($bill->payableamount==$totalPaidAmount&&$bill->balance==0.0)
+
+
+        {
+
+            return response()->json([
+                "success" => true,
+                "message"=>"Bill Already Paid"
+            ]);
+        }
+        
+       
         $payableAmount=$bill->payableamount;
-
-
         $balance=$bill->balance;
 
+        $paidAmount=$totalPaidAmount;
 
-        $amount=$balance-$payableAmount;
+
+        $amount=$balance-$totalPaidAmount;
 
         if($amount<0)
         {$amount=0.0;}
     
-        $bill->payableamount=$amount;
+        // $bill->payableamount=$payableAmount;
         $bill->balance=$amount;
+        $bill->totalpaidamount=$bill->totalpaidamount+$paidAmount;
         $bill->status=$billPaidStatus;
+        $bill->paymenttype=$paymentType;
         $bill->update();
 
 
@@ -639,7 +604,6 @@ class BillController extends Controller
 
         return response()->json([
             "success" => true,
-            "data" => $bill,
             "message"=>"Bill Paid Successfully"
         ]);
 

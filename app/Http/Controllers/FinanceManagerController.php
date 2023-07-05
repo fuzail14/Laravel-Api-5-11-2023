@@ -26,7 +26,7 @@ class FinanceManagerController extends Controller
             'password' => 'required',
             'image' => 'nullable|image',
             "subadminid" => 'required|exists:subadmins,subadminid',
-            "superadminid" => 'required|exists:societies,id',
+            "superadminid" => 'required|exists:societies,superadminid',
             "societyid" => 'required|exists:societies,id',
             
         ]);
@@ -202,34 +202,20 @@ class FinanceManagerController extends Controller
     }
 
 
-    public function currentMonthBills($subadminid)
+    public function currentMonthBills($subadminid,$financemanagerid)
     {
 
-        //User
-        //Resident
+        
 
 
-
-       
-
+    
         $currentDate = date('Y-m-d');
         $currentYear = date('Y', strtotime($currentDate));
         
         $currentMonth = date('m', strtotime($currentDate));
 
-        // $bills = Bill::where('subadminid', $subadminid)
-        //  ->whereMonth('billenddate', $currentMonth)
-        //  ->whereYear(
-        //     'billenddate',
-        //     $currentYear
-        // )
-        // ->whereIn('status',[0,1])
-        //     ->with('user')
-        //     ->with('resident')
-        //     ->get();
-
                
-        $bills = Bill::where('subadminid', $subadminid)
+        $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
         ->whereMonth('billenddate', $currentMonth)
         ->whereYear(
            'billenddate',
@@ -251,5 +237,311 @@ class FinanceManagerController extends Controller
     }
 
 
+    public function filterBills(
+       
+     )
+    {
+
+        $status= request()->status??null;
+        $paymenttype= request()->   paymenttype??null;
+        $startdate= request()->   startdate??null;
+        $enddate= request()->  enddate??null;
+        $subadminid= request()->  subadminid??null;
+        $financemanagerid= request()->  financemanagerid??null;
+
+
+        $isValidate = Validator::make(request()->all(), [
+            
+            'startdate' => 'date|nullable',
+            'enddate' => 'date|nullable',
+            'paymenttype' => 'nullable',
+            'status' => 'nullable',
+            'subadminid' => 'required|exists:subadmins,subadminid',
+            'financemanagerid' => 'required|exists:financemanagers,financemanagerid',
+
+            
+        ]);
+        if ($isValidate->fails()) {
+            return response()->json([
+                "errors" => $isValidate->errors()->all(),
+                "success" => false
+            ], 403);
+        }
+
+        $startDatecurrentYear = date('Y', strtotime($startdate));
+        $startDatecurrentMonth = date('m', strtotime($startdate));
+        $endDatecurrentYear = date('Y', strtotime($enddate));
+        $endDatecurrentMonth = date('m', strtotime($enddate));
+        // echo($status);
+        // echo($paymenttype);
+        // echo($startdate);
+        // echo($enddate);
+        
+         if(!empty($status)&&!empty($paymenttype)&&!empty($startdate)&&!empty($enddate))
+
+        {
+
+            
+            $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
+            ->where('status',$status)->where('paymenttype',$paymenttype)
+           ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+                'billstartdate',
+                $startDatecurrentYear
+            ) ->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+                'billenddate',
+                $endDatecurrentYear
+            )
+            ->with('resident')
+            ->with('user')
+            ->with('measurement')
+            ->get();
+    
+             return response()->json([
+                "success" => true,
+                "data" => $bills,
+            ]);
+
+
+
+        }
+
+         if(!empty($status)&&!empty($paymenttype))
+
+        {
+
+
+            $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
+            ->where('paymenttype',$paymenttype)
+            ->where('status',$status)
+            ->with('resident')
+            ->with('user')
+            ->with('measurement')
+            ->get();
+    
+             return response()->json([
+                "success" => true,
+                "data" => $bills,
+            ]);
+        }
+
+
+        else if(!empty($status)&&!empty($startdate)&&!empty($enddate))
+
+        {
+
+
+            $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)->
+            where('status',$status)
+           ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+                'billstartdate',
+                $startDatecurrentYear
+            ) ->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+                'billenddate',
+                $endDatecurrentYear
+            )
+            ->with('resident')
+            ->with('user')
+            ->with('measurement')
+            ->get();
+    
+             return response()->json([
+                "success" => true,
+                "data" => $bills,
+            ]);
+
+
+
+        }
+
+        else if(!empty($paymenttype)&&!empty($startdate)&&!empty($enddate))
+
+        {
+
+            
+            $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
+            ->where('paymenttype',$paymenttype)
+           ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+                'billstartdate',
+                $startDatecurrentYear
+            ) ->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+                'billenddate',
+                $endDatecurrentYear
+            )
+            ->with('resident')
+            ->with('user')
+            ->with('measurement')
+            ->get();
+    
+             return response()->json([
+                "success" => true,
+                "data" => $bills,
+            ]);
+
+        }
+
+        
+      
+
+        else if(!empty($status))
+
+        {
+
+            $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
+            ->where('status',$status)
+    
+            ->with('resident')
+            ->with('user')
+            ->with('measurement')
+            ->get();
+    
+             return response()->json([
+                "success" => true,
+                "data" => $bills,
+            ]);
+        }
+
+       else if(!empty($paymenttype))
+
+        {
+            $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
+            ->where('paymenttype',$paymenttype)
+            ->with('resident')
+            ->with('user')
+            ->with('measurement')
+            ->get();
+    
+             return response()->json([
+                "success" => true,
+                "data" => $bills,
+            ]);
+        }
+
+        else if(!empty($startdate)&&!empty($enddate))
+
+        {
+            
+
+           
+            $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
+           ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+                'billstartdate',
+                $startDatecurrentYear
+            ) ->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+                'billenddate',
+                $endDatecurrentYear
+            )
+            ->with('resident')
+            ->with('user')
+            ->with('measurement')
+            ->get();
+    
+             return response()->json([
+                "success" => true,
+                "data" => $bills,
+            ]);
+
+
+
+
+        }
+
+
+
+        else {
+            
+
+            $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
+    
+        ->with('resident')
+        ->with('user')
+        ->with('measurement')
+        ->get();
+
+         return response()->json([
+            "success" => true,
+            "data" => $bills,
+        ]);
+
+        }
+        
+    }
+
+
+    public function    billSearch(Request $request)
+    {
+        
+        $subadminid= $request->input('subadminid');
+        $financemanagerid= $request->input('financemanagerid');
+        $search= rawurldecode( $request->input('search'));
+
+        $isValidate = Validator::make(request()->all(), [
+            
+            
+            'subadminid' => 'required|exists:subadmins,subadminid',
+            'search' => 'nullable',
+            'financemanagerid' => 'required|exists:financemanagers,financemanagerid',
+
+
+            
+        ]);
+
+
+
+        if ($isValidate->fails()) {
+            return response()->json([
+                "errors" => $isValidate->errors()->all(),
+                "success" => false
+            ], 403);
+        }
+
+
+        if (!empty($search))
+        {
+            $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
+            ->with(['resident', 'user', 'measurement'])
+            ->whereHas('user', function ($query) use ($search) {
+                $query->
+                Where('firstname', 'LIKE', '%' . $search . '%')
+                ->orWhere('lastname', 'LIKE', '%' . $search . '%')
+                ->orWhere('mobileno', 'LIKE', '%' . $search . '%')
+                ->orWhere('cnic', 'LIKE', '%' . $search . '%')
+                ->orWhere( 'address', 'LIKE', '%' . $search. '%');
+                
+            })
+            ->get();
+            
+
+
+
+            
+
+         return response()->json([
+            "success" => true,
+            "data" => $bills,
+        ]);
+        }
+
+        $currentDate = date('Y-m-d');
+        $currentYear = date('Y', strtotime($currentDate));
+        
+        $currentMonth = date('m', strtotime($currentDate));
+
+               
+        $bills = Bill::where('subadminid', $subadminid)->where( "financemanagerid",$financemanagerid)
+        ->whereMonth('billenddate', $currentMonth)
+        ->whereYear(
+           'billenddate',
+           $currentYear
+        )->with('resident')
+        ->with('user')
+        ->with('measurement')
+        ->get();
+
+
+        return response()->json([
+            "success" => true,
+            "data" => $bills,
+        ]);
+    }
 
 }

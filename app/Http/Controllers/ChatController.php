@@ -5,7 +5,6 @@ use App\Models\Chat;
 use App\Models\Gatekeeper;
 use App\Models\Resident;
 use Illuminate\Support\Facades\Validator;
-use App\Event\UserChat;
 use Illuminate\Http\Request;
 
 class ChatController extends Controller
@@ -78,7 +77,9 @@ class ChatController extends Controller
     public function chatneighbours($subadminid)
     {
 
-       $chatneighbours=   Resident::where('subadminid', $subadminid)->where('status',1)->join('users', 'residents.residentid', '=', 'users.id')->get();
+       $chatneighbours=   Resident::where('subadminid', $subadminid)
+       ->where('status',1)->join('users', 'residents.residentid', '=', 'users.id')
+       ->get();
 
         return
         response()->json(["success"=>true,

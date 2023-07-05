@@ -14,6 +14,22 @@ class CreateMarketplacesTable extends Migration
     public function up()
     {
         Schema::create('marketplaces', function (Blueprint $table) {
+            // $table->id();
+            // $table->unsignedBigInteger('residentid');
+            // $table->foreign('residentid')->references('residentid')->on('residents')->onDelete('cascade');
+            // $table->unsignedBigInteger('societyid');
+            // $table->foreign('societyid')->references('id')->on('societies')->onDelete('cascade');
+            // $table->unsignedBigInteger('subadminid');
+            // $table->foreign('subadminid')->references('subadminid')->on('subadmins')->onDelete('cascade');
+
+            // $table->string('productname');
+            // $table->string('description');
+            // $table->string('productprice');
+            // $table->string('images');
+
+            // //$table->json('images')->nullable();
+            // $table->timestamps();
+
             $table->id();
             $table->unsignedBigInteger('residentid');
             $table->foreign('residentid')->references('residentid')->on('residents')->onDelete('cascade');
@@ -21,14 +37,18 @@ class CreateMarketplacesTable extends Migration
             $table->foreign('societyid')->references('id')->on('societies')->onDelete('cascade');
             $table->unsignedBigInteger('subadminid');
             $table->foreign('subadminid')->references('subadminid')->on('subadmins')->onDelete('cascade');
-
             $table->string('productname');
             $table->string('description');
             $table->string('productprice');
+            $table->string('contact');
+            $table->string('category');
+            $table->string('condition');
             $table->string('images');
 
             //$table->json('images')->nullable();
             $table->timestamps();
+
+
         });
     }
 

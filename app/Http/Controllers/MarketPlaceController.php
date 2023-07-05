@@ -26,6 +26,9 @@ class MarketPlaceController extends Controller
             'description' => 'required',
             'productprice' => 'required',
             'images' => 'required',
+            'contact' => 'nullable',
+            'category' => 'nullable',
+            'condition' => 'nullable',
             //'images.*' => 'image'
 
 
@@ -61,6 +64,9 @@ class MarketPlaceController extends Controller
         $product->description = $request->description;
         $product->productprice = $request->productprice;
         $product->description = $request->description;
+        $product->contact = $request->contact??"";
+        $product->category = $request->category??"";
+        $product->condition = $request->condition??"";
         $images = $request->file('images');
         $imageName = time() . "." . $images->extension();
         $images->move(public_path('/storage/'), $imageName);
