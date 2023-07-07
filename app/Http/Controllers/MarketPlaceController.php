@@ -64,9 +64,9 @@ class MarketPlaceController extends Controller
         $product->description = $request->description;
         $product->productprice = $request->productprice;
         $product->description = $request->description;
-        $product->contact = $request->contact??"";
-        $product->category = $request->category??"";
-        $product->condition = $request->condition??"";
+        $product->contact = $request->contact ?? "";
+        $product->category = $request->category ?? "";
+        $product->condition = $request->condition ?? "";
         $images = $request->file('images');
         $imageName = time() . "." . $images->extension();
         $images->move(public_path('/storage/'), $imageName);
@@ -87,15 +87,13 @@ class MarketPlaceController extends Controller
             'success' => true,
             'data' => $products
         ]);
-
-
     }
 
     public function viewSellProductsResidnet($residentid)
     {
         $products = Marketplace::where('residentid', $residentid)
-        ->with('resident')
-        ->with('residentdata')->get();
+            ->with('resident')
+            ->with('residentdata')->get();
         return response()->json([
             'success' => true,
             'data' => $products
@@ -108,14 +106,14 @@ class MarketPlaceController extends Controller
     public function productSellerInfo($residentid)
     {
 
-       $chatneighbours=   Resident::where('residentid', $residentid)
-       ->where('status',1)->join('users', 'residents.residentid', '=', 'users.id')
-       ->get();
+        $chatneighbours =   Resident::where('residentid', $residentid)
+            ->where('status', 1)->join('users', 'residents.residentid', '=', 'users.id')
+            ->get();
 
         return
-        response()->json(["success"=>true,
-        "data" => $chatneighbours]);
-
+            response()->json([
+                "success" => true,
+                "data" => $chatneighbours
+            ]);
     }
-
 }

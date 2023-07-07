@@ -14,8 +14,9 @@ class NoticeBoardController extends Controller
             'noticedetail' => 'required|string',
             'startdate' => 'required|date',
             'enddate' => 'required|date|after:startdate',
-            'starttime' => 'date_format:H:i|required',
-            'endtime' => 'date_format:H:i|after:starttime|required',
+            // 'starttime' => 'date_format:H:i|required',
+            // 'endtime' => 'date_format:H:i|after:starttime|required',
+
             'status' => 'required',
             'subadminid' => 'required|exists:users,id',
         ]);
@@ -30,8 +31,9 @@ class NoticeBoardController extends Controller
         $notice->noticedetail = $request->noticedetail;
         $notice->startdate =  Carbon::parse($request->startdate);
         $notice->enddate =  Carbon::parse($request->enddate);
-        $notice->starttime = $request->starttime;
-        $notice->endtime = $request->endtime;
+        // $notice->starttime = $request->starttime;
+        // $notice->endtime = $request->endtime;
+
         $notice->status = $request->status;
         $notice->subadminid = $request->subadminid;
         $notice->save();
@@ -125,8 +127,9 @@ class NoticeBoardController extends Controller
             'noticedetail' => 'required|string',
             'startdate' => 'required|date',
             'enddate' => 'required|date|after:startdate',
-            'starttime' => 'date_format:H:i',
-            'endtime' => 'date_format:H:i|after:starttime',
+            // 'starttime' => 'date_format:H:i',
+            // 'endtime' => 'date_format:H:i|after:starttime',
+
             'status' => 'required',
             'id' => 'required|exists:notices,id',
         ]);
@@ -141,8 +144,9 @@ class NoticeBoardController extends Controller
         $notice->noticedetail = $request->noticedetail;
         $notice->startdate =  Carbon::parse($request->startdate)->format('y-m-d');
         $notice->enddate =  Carbon::parse($request->enddate)->format('y-m-d');
-        $notice->starttime = $request->starttime;
-        $notice->endtime = $request->endtime;
+        // $notice->starttime = $request->starttime;
+        // $notice->endtime = $request->endtime;
+
         $notice->status = $request->status;
         $notice->save();
         return response()->json([

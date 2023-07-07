@@ -1,7 +1,10 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
 class Notice extends Model
 {
     use HasFactory;
@@ -10,15 +13,17 @@ class Notice extends Model
         'noticedetail',
         'startdate',
         'enddate',
-        'starttime',
-        'endtime',
+        // 'starttime',
+        // 'endtime',
+
         'status',
         'subadminid',
     ];
 
 
-    protected $casts = [ "subadminid"=> 'integer',
+    protected $casts = [
+        "subadminid" => 'integer',
 
 
-];
+    ];
 }
