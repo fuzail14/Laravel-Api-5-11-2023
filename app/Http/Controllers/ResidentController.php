@@ -335,7 +335,7 @@ class ResidentController extends Controller
 
 
         $data = Resident::where('subadminid', $id)->where('status', 1)
-            ->join('users', 'users.id', '=', 'residents.residentid',)->with('societydata')
+            ->join('users', 'users.id', '=', 'residents.residentid',)->with('bills')
             ->get();
 
 
@@ -347,6 +347,7 @@ class ResidentController extends Controller
             ]
         );
     }
+    
 
     public function deleteresident($id)
 
