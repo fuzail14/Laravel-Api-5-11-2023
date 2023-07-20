@@ -66,7 +66,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('registerresident', [ResidentController::class, 'registerresident']);
   Route::get('viewresidents/{id}', [ResidentController::class, 'viewresidents']);
   Route::get('deleteresident/{id}', [ResidentController::class, 'deleteresident']);
-  Route::get('searchresident/{subadminid}/{q?}', [ResidentController::class, 'searchresident']);
+  Route::get('searchresident/{q?}', [ResidentController::class, 'searchresident']);
   Route::post('updateresident', [ResidentController::class, 'updateresident']);
   Route::get('loginresidentdetails/{residentid}', [ResidentController::class, 'loginresidentdetails']);
   Route::get('unverifiedresident/{subadminid}/{status}', [ResidentController::class, 'unverifiedresident']);
@@ -272,9 +272,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
   //Super Admin Finance Managers
 
   Route::post('superadmin-finance-manager/superAdminFinanceMangerRegister', [SuperAdminFinanceManagerController::class, 'superAdminFinanceMangerRegister']);
-  Route::get('finance-manager/view/{id}', [FinanceManagerController::class, 'view']);
-  Route::get('finance-manager/delete/{id}', [FinanceManagerController::class, 'delete']);
-  Route::post('finance-manager/update', [FinanceManagerController::class, 'update']);
+  Route::get('finance-manager/view/{id}', [SuperAdminFinanceManagerController::class, 'view']);
+  Route::post('finance-manager/update', [SuperAdminFinanceManagerController::class, 'update']);
+  Route::get('finance-manager/allresidentsBill/{subadminid}', [SuperAdminFinanceManagerController::class, 'allresidentsBill']);
+  Route::get('finance-manager/searchResidentsBill/{subadminid}/{q?}', [SuperAdminFinanceManagerController::class, 'searchResidentsBill']);
+  Route::get('finance-manager/filterBills', [SuperAdminFinanceManagerController::class, 'filterBills']);
+  
+
+  
 });
 
 

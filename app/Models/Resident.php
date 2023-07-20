@@ -132,7 +132,7 @@ protected $primarykey='residentid';
     }
     public function bills()
     {
-        return $this->hasMany('App\Models\Bill', 'subadminid', 'subadminid');
+        return $this->hasMany('App\Models\Bill', 'residentid', 'residentid');
     }
  
     protected $casts = [ "status"=> 'integer',
