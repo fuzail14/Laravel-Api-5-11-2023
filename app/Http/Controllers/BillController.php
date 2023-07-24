@@ -69,6 +69,7 @@ class BillController extends Controller
         $duedate = $request->duedate;
         $billstartdate = $request->billstartdate;
         $billenddate = $request->billenddate;
+        
 
         $residents = Resident::where('subadminid', $subadminid)
             ->where('status', 1)

@@ -19,6 +19,7 @@ class CreateSuperadminfinancemanagersTable extends Migration
             $table->foreign('financemanagerid')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('superadminid');
             $table->foreign('superadminid')->references('id')->on('users')->onDelete('cascade');
+            
             $table->string('status');
             $table->timestamps();
         });

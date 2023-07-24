@@ -193,53 +193,7 @@ class SuperAdminFinanceManagerController extends Controller
     }
 
 
-    public function currentMonthBills($subadminid)
-    {
 
-        //User
-        //Resident
-
-
-
-
-
-        $currentDate = date('Y-m-d');
-        $currentYear = date('Y', strtotime($currentDate));
-
-        $currentMonth = date('m', strtotime($currentDate));
-
-        // $bills = Bill::where('subadminid', $subadminid)
-        //  ->whereMonth('billenddate', $currentMonth)
-        //  ->whereYear(
-        //     'billenddate',
-        //     $currentYear
-        // )
-        // ->whereIn('status',[0,1])
-        //     ->with('user')
-        //     ->with('resident')
-        //     ->get();
-
-
-        $bills = Bill::where('subadminid', $subadminid)
-            ->whereMonth('billenddate', $currentMonth)
-            ->whereYear(
-                'billenddate',
-                $currentYear
-            )->with('resident')
-            ->with('user')
-            ->with('measurement')
-            ->get();
-
-
-
-
-
-
-        return response()->json([
-            "success" => true,
-            "data" => $bills,
-        ]);
-    }
 
 
 
@@ -345,7 +299,6 @@ class SuperAdminFinanceManagerController extends Controller
 
 
 
-
     public function filterBills()
     {
 
@@ -375,46 +328,17 @@ class SuperAdminFinanceManagerController extends Controller
             ], 403);
         }
 
+        $startDatecurrentYear = date('Y', strtotime($startdate));
+        $startDatecurrentMonth = date('m', strtotime($startdate));
+        $endDatecurrentYear = date('Y', strtotime($enddate));
+        $endDatecurrentMonth = date('m', strtotime($enddate));
+        // echo($status);
+        // echo($paymenttype);
+        // echo($startdate);
+        // echo($enddate);
 
-
-
-        //Suleman WORK
-        // if (!empty($status) && !empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
-
-
-        //     $bills = Bill::where('bills.subadminid', $subadminid)
-        //         ->join('users', 'users.id', '=', 'bills.residentid')
-        //         ->join('residents', 'residents.residentid', '=', 'bills.residentid')
-        //         ->select(
-        //             'bills.*',
-        //             'users.*',
-        //             'residents.vechileno',
-        //             'residents.residenttype',
-        //             'residents.propertytype',
-        //             'residents.committeemember'
-
-        //         )
-        //         ->where('bills.status', $status)->where('paymenttype', $paymenttype)
-        //         ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
-        //             'billstartdate',
-        //             $startDatecurrentYear
-        //         )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
-        //             'billenddate',
-        //             $endDatecurrentYear
-        //         )
-
-        //         ->get();
-
-        //     return response()->json([
-        //         "success" => true,
-        //         "data" => $bills,
-        //     ]);
-        // }
-
-        //FUZAIL WORK YEAR MONTH DATE BETWEEN 
         if (!empty($status) && !empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
-            $startDate = date('Y-m-d', strtotime($startdate));
-            $endDate = date('Y-m-d', strtotime($enddate));
+
 
             $bills = Bill::where('bills.subadminid', $subadminid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
@@ -426,22 +350,25 @@ class SuperAdminFinanceManagerController extends Controller
                     'residents.residenttype',
                     'residents.propertytype',
                     'residents.committeemember'
+
                 )
-                ->where('bills.status', $status)
-                ->where('paymenttype', $paymenttype)
-                ->where(function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('billstartdate', [$startDate, $endDate])
-                        ->orWhereBetween('billenddate', [$startDate, $endDate]);
-                })
+
+                ->where('bills.status', $status)->where('paymenttype', $paymenttype)
+                ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+                    'billstartdate',
+                    $startDatecurrentYear
+                )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+                    'billenddate',
+                    $endDatecurrentYear
+                )
+
                 ->get();
 
             return response()->json([
                 "success" => true,
-                "data" => $bills,
+                "residentslist" => $bills,
             ]);
         }
-
-
 
         if (!empty($status) && !empty($paymenttype)) {
 
@@ -457,55 +384,17 @@ class SuperAdminFinanceManagerController extends Controller
                     'residents.propertytype',
                     'residents.committeemember'
 
-                )
-                ->where('paymenttype', $paymenttype)
+                )->where('paymenttype', $paymenttype)
                 ->where('bills.status', $status)
 
                 ->get();
 
             return response()->json([
                 "success" => true,
-                "data" => $bills,
+                "residentslist" => $bills,
             ]);
-        }
+        } else if (!empty($status) && !empty($startdate) && !empty($enddate)) {
 
-        //SULEMAN WORK 
-        // else if (!empty($status) && !empty($startdate) && !empty($enddate)) {
-
-
-        //     $bills = Bill::where('bills.subadminid', $subadminid)
-        //         ->join('users', 'users.id', '=', 'bills.residentid')
-        //         ->join('residents', 'residents.residentid', '=', 'bills.residentid')
-        //         ->select(
-        //             'bills.*',
-        //             'users.*',
-        //             'residents.vechileno',
-        //             'residents.residenttype',
-        //             'residents.propertytype',
-        //             'residents.committeemember'
-
-        //         )
-        //         ->where('bills.status', $status)
-        //         ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
-        //             'billstartdate',
-        //             $startDatecurrentYear
-        //         )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
-        //             'billenddate',
-        //             $endDatecurrentYear
-        //         )
-
-        //         ->get();
-
-        //     return response()->json([
-        //         "success" => true,
-        //         "data" => $bills,
-        //     ]);
-        // } 
-
-        //FUZAIL YEAR MONTH DATE WORK 
-        else if (!empty($status) && !empty($startdate) && !empty($enddate)) {
-            $startDate = date('Y-m-d', strtotime($startdate));
-            $endDate = date('Y-m-d', strtotime($enddate));
 
             $bills = Bill::where('bills.subadminid', $subadminid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
@@ -517,57 +406,24 @@ class SuperAdminFinanceManagerController extends Controller
                     'residents.residenttype',
                     'residents.propertytype',
                     'residents.committeemember'
+
                 )
-                ->where('bills.status', $status)
-                ->where(function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('billstartdate', [$startDate, $endDate])
-                        ->orWhereBetween('billenddate', [$startDate, $endDate]);
-                })
+                ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+                    'billstartdate',
+                    $startDatecurrentYear
+                )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+                    'billenddate',
+                    $endDatecurrentYear
+                )
+
                 ->get();
 
             return response()->json([
                 "success" => true,
-                "data" => $bills,
+                "residentslist" => $bills,
             ]);
-        }
+        } else if (!empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
 
-        //SULEMAN.................. 
-        // else if (!empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
-
-
-        //     $bills = Bill::where('bills.subadminid', $subadminid)
-        //         ->join('users', 'users.id', '=', 'bills.residentid')
-        //         ->join('residents', 'residents.residentid', '=', 'bills.residentid')
-        //         ->select(
-        //             'bills.*',
-        //             'users.*',
-        //             'residents.vechileno',
-        //             'residents.residenttype',
-        //             'residents.propertytype',
-        //             'residents.committeemember'
-
-        //         )
-        //         ->where('paymenttype', $paymenttype)
-        //         ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
-        //             'billstartdate',
-        //             $startDatecurrentYear
-        //         )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
-        //             'billenddate',
-        //             $endDatecurrentYear
-        //         )
-
-        //         ->get();
-
-        //     return response()->json([
-        //         "success" => true,
-        //         "data" => $bills,
-        //     ]);
-        // } 
-
-        //FUZAIL ......... BETWEEN.....
-        else if (!empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
-            $startDate = date('Y-m-d', strtotime($startdate));
-            $endDate = date('Y-m-d', strtotime($enddate));
 
             $bills = Bill::where('bills.subadminid', $subadminid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
@@ -579,23 +435,24 @@ class SuperAdminFinanceManagerController extends Controller
                     'residents.residenttype',
                     'residents.propertytype',
                     'residents.committeemember'
+
+                )->where('paymenttype', $paymenttype)
+                ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+                    'billstartdate',
+                    $startDatecurrentYear
+                )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+                    'billenddate',
+                    $endDatecurrentYear
                 )
-                ->where('paymenttype', $paymenttype)
-                ->where(function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('billstartdate', [$startDate, $endDate])
-                        ->orWhereBetween('billenddate', [$startDate, $endDate]);
-                })
+
                 ->get();
 
             return response()->json([
                 "success" => true,
-                "data" => $bills,
+                "residentslist" => $bills,
             ]);
         } else if (!empty($status)) {
 
-
-
-
             $bills = Bill::where('bills.subadminid', $subadminid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
@@ -615,7 +472,7 @@ class SuperAdminFinanceManagerController extends Controller
 
             return response()->json([
                 "success" => true,
-                "data" => $bills,
+                "residentslist" => $bills,
             ]);
         } else if (!empty($paymenttype)) {
             $bills = Bill::where('bills.subadminid', $subadminid)
@@ -630,84 +487,16 @@ class SuperAdminFinanceManagerController extends Controller
                     'residents.committeemember'
 
                 )
-
-                ->where('bills.paymenttype', $paymenttype)
+                ->where('paymenttype', $paymenttype)
 
                 ->get();
 
             return response()->json([
                 "success" => true,
-                "data" => $bills,
+                "residentslist" => $bills,
             ]);
-        }
+        } else if (!empty($startdate) && !empty($enddate)) {
 
-        //FUZAIL WORK YEAR MONTH AND DATE IN BETWEEN QUERY WORK
-
-        elseif (!empty($startdate) && !empty($enddate)) {
-            $startDate = date('Y-m-d', strtotime($startdate));
-            $endDate = date('Y-m-d', strtotime($enddate));
-
-            $bills = Bill::where('bills.subadminid', $subadminid)
-                ->join('users', 'users.id', '=', 'bills.residentid')
-                ->join('residents', 'residents.residentid', '=', 'bills.residentid')
-                ->select(
-                    'bills.*',
-                    'users.*',
-                    'residents.vechileno',
-                    'residents.residenttype',
-                    'residents.propertytype',
-                    'residents.committeemember'
-                )
-                ->where(function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('billstartdate', [$startDate, $endDate])
-                        ->orWhereBetween('billenddate', [$startDate, $endDate]);
-                })
-                ->get();
-
-            return response()->json([
-                "success" => true,
-                "data" => $bills,
-            ]);
-        }
-
-        //SuleMan Work
-        // else if (!empty($startdate) && !empty($enddate)) {
-
-        //     $startDate = date('Y-m-d', strtotime($startdate));
-        //     $endDate = date('Y-m-d', strtotime($enddate));
-
-
-
-        //     $bills = Bill::where('bills.subadminid', $subadminid)
-        //         ->join('users', 'users.id', '=', 'bills.residentid')
-        //         ->join('residents', 'residents.residentid', '=', 'bills.residentid')
-        //         ->select(
-        //             'bills.*',
-        //             'users.*',
-        //             'residents.vechileno',
-        //             'residents.residenttype',
-        //             'residents.propertytype',
-        //             'residents.committeemember'
-
-        //         )
-
-        //         ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
-        //             'billstartdate',
-        //             $startDatecurrentYear
-        //         )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
-        //             'billenddate',
-        //             $endDatecurrentYear
-        //         )
-
-        //         ->get();
-
-
-        //     return response()->json([
-        //         "success" => true,
-        //         "data" => $bills,
-        //     ]);
-        // } 
-        else {
 
 
             $bills = Bill::where('bills.subadminid', $subadminid)
@@ -722,14 +511,473 @@ class SuperAdminFinanceManagerController extends Controller
                     'residents.committeemember'
 
                 )
-
+                ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+                    'billstartdate',
+                    $startDatecurrentYear
+                )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+                    'billenddate',
+                    $endDatecurrentYear
+                )
 
                 ->get();
 
             return response()->json([
                 "success" => true,
-                "data" => $bills,
+                "residentslist" => $bills,
+            ]);
+        } else {
+
+
+            $bills = Bill::where('bills.subadminid', $subadminid)
+                ->join('users', 'users.id', '=', 'bills.residentid')
+                ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+                ->select(
+                    'bills.*',
+                    'users.*',
+                    'residents.vechileno',
+                    'residents.residenttype',
+                    'residents.propertytype',
+                    'residents.committeemember'
+
+                )
+                ->get();
+
+            return response()->json([
+                "success" => true,
+                "residentslist" => $bills,
             ]);
         }
     }
+
+    public function currentMonthBills($subadminid)
+    {
+
+
+
+
+
+        $currentDate = date('Y-m-d');
+        $currentYear = date('Y', strtotime($currentDate));
+
+        $currentMonth = date('m', strtotime($currentDate));
+
+
+        $bills = Bill::where('bills.subadminid', $subadminid)
+            ->join('users', 'users.id', '=', 'bills.residentid')
+            ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+            ->select(
+                'bills.*',
+                'users.*',
+                'residents.vechileno',
+                'residents.residenttype',
+                'residents.propertytype',
+                'residents.committeemember'
+
+            )
+
+            ->whereMonth('billenddate', $currentMonth)
+            ->whereYear(
+                'billenddate',
+                $currentYear
+            )
+            ->get();
+
+
+
+
+
+
+        return response()->json([
+            "success" => true,
+            "residentslist" => $bills,
+        ]);
+    }
+
+
+    // public function filterBills()
+    // {
+
+    //     $status = request()->status ?? null;
+    //     $paymenttype = request()->paymenttype ?? null;
+    //     $startdate = request()->startdate ?? null;
+    //     $enddate = request()->enddate ?? null;
+    //     $subadminid = request()->subadminid ?? null;
+
+
+
+    //     $isValidate = Validator::make(request()->all(), [
+
+    //         'startdate' => 'date|nullable',
+    //         'enddate' => 'date|nullable',
+    //         'paymenttype' => 'nullable',
+    //         'status' => 'nullable',
+    //         'subadminid' => 'required|exists:subadmins,subadminid',
+
+
+
+    //     ]);
+    //     if ($isValidate->fails()) {
+    //         return response()->json([
+    //             "errors" => $isValidate->errors()->all(),
+    //             "success" => false
+    //         ], 403);
+    //     }
+
+
+
+
+    //     //Suleman WORK
+    //     // if (!empty($status) && !empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
+
+
+    //     //     $bills = Bill::where('bills.subadminid', $subadminid)
+    //     //         ->join('users', 'users.id', '=', 'bills.residentid')
+    //     //         ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //     //         ->select(
+    //     //             'bills.*',
+    //     //             'users.*',
+    //     //             'residents.vechileno',
+    //     //             'residents.residenttype',
+    //     //             'residents.propertytype',
+    //     //             'residents.committeemember'
+
+    //     //         )
+    //     //         ->where('bills.status', $status)->where('paymenttype', $paymenttype)
+    //     //         ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+    //     //             'billstartdate',
+    //     //             $startDatecurrentYear
+    //     //         )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+    //     //             'billenddate',
+    //     //             $endDatecurrentYear
+    //     //         )
+
+    //     //         ->get();
+
+    //     //     return response()->json([
+    //     //         "success" => true,
+    //     //         "data" => $bills,
+    //     //     ]);
+    //     // }
+
+    //     //FUZAIL WORK YEAR MONTH DATE BETWEEN 
+    //     if (!empty($status) && !empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
+    //         $startDate = date('Y-m-d', strtotime($startdate));
+    //         $endDate = date('Y-m-d', strtotime($enddate));
+
+    //         $bills = Bill::where('bills.subadminid', $subadminid)
+    //             ->join('users', 'users.id', '=', 'bills.residentid')
+    //             ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //             ->select(
+    //                 'bills.*',
+    //                 'users.*',
+    //                 'residents.vechileno',
+    //                 'residents.residenttype',
+    //                 'residents.propertytype',
+    //                 'residents.committeemember'
+    //             )
+    //             ->where('bills.status', $status)
+    //             ->where('paymenttype', $paymenttype)
+    //             ->where(function ($query) use ($startDate, $endDate) {
+    //                 $query->whereBetween('billstartdate', [$startDate, $endDate])
+    //                     ->orWhereBetween('billenddate', [$startDate, $endDate]);
+    //             })
+    //             ->get();
+
+    //         return response()->json([
+    //             "success" => true,
+    //             "data" => $bills,
+    //         ]);
+    //     }
+
+
+
+    //     if (!empty($status) && !empty($paymenttype)) {
+
+
+    //         $bills = Bill::where('bills.subadminid', $subadminid)
+    //             ->join('users', 'users.id', '=', 'bills.residentid')
+    //             ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //             ->select(
+    //                 'bills.*',
+    //                 'users.*',
+    //                 'residents.vechileno',
+    //                 'residents.residenttype',
+    //                 'residents.propertytype',
+    //                 'residents.committeemember'
+
+    //             )
+    //             ->where('paymenttype', $paymenttype)
+    //             ->where('bills.status', $status)
+
+    //             ->get();
+
+    //         return response()->json([
+    //             "success" => true,
+    //             "data" => $bills,
+    //         ]);
+    //     }
+
+    //     //SULEMAN WORK 
+    //     // else if (!empty($status) && !empty($startdate) && !empty($enddate)) {
+
+
+    //     //     $bills = Bill::where('bills.subadminid', $subadminid)
+    //     //         ->join('users', 'users.id', '=', 'bills.residentid')
+    //     //         ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //     //         ->select(
+    //     //             'bills.*',
+    //     //             'users.*',
+    //     //             'residents.vechileno',
+    //     //             'residents.residenttype',
+    //     //             'residents.propertytype',
+    //     //             'residents.committeemember'
+
+    //     //         )
+    //     //         ->where('bills.status', $status)
+    //     //         ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+    //     //             'billstartdate',
+    //     //             $startDatecurrentYear
+    //     //         )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+    //     //             'billenddate',
+    //     //             $endDatecurrentYear
+    //     //         )
+
+    //     //         ->get();
+
+    //     //     return response()->json([
+    //     //         "success" => true,
+    //     //         "data" => $bills,
+    //     //     ]);
+    //     // } 
+
+    //     //FUZAIL YEAR MONTH DATE WORK 
+    //     else if (!empty($status) && !empty($startdate) && !empty($enddate)) {
+    //         $startDate = date('Y-m-d', strtotime($startdate));
+    //         $endDate = date('Y-m-d', strtotime($enddate));
+
+    //         $bills = Bill::where('bills.subadminid', $subadminid)
+    //             ->join('users', 'users.id', '=', 'bills.residentid')
+    //             ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //             ->select(
+    //                 'bills.*',
+    //                 'users.*',
+    //                 'residents.vechileno',
+    //                 'residents.residenttype',
+    //                 'residents.propertytype',
+    //                 'residents.committeemember'
+    //             )
+    //             ->where('bills.status', $status)
+    //             ->where(function ($query) use ($startDate, $endDate) {
+    //                 $query->whereBetween('billstartdate', [$startDate, $endDate])
+    //                     ->orWhereBetween('billenddate', [$startDate, $endDate]);
+    //             })
+    //             ->get();
+
+    //         return response()->json([
+    //             "success" => true,
+    //             "data" => $bills,
+    //         ]);
+    //     }
+
+    //     //SULEMAN.................. 
+    //     // else if (!empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
+
+
+    //     //     $bills = Bill::where('bills.subadminid', $subadminid)
+    //     //         ->join('users', 'users.id', '=', 'bills.residentid')
+    //     //         ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //     //         ->select(
+    //     //             'bills.*',
+    //     //             'users.*',
+    //     //             'residents.vechileno',
+    //     //             'residents.residenttype',
+    //     //             'residents.propertytype',
+    //     //             'residents.committeemember'
+
+    //     //         )
+    //     //         ->where('paymenttype', $paymenttype)
+    //     //         ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+    //     //             'billstartdate',
+    //     //             $startDatecurrentYear
+    //     //         )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+    //     //             'billenddate',
+    //     //             $endDatecurrentYear
+    //     //         )
+
+    //     //         ->get();
+
+    //     //     return response()->json([
+    //     //         "success" => true,
+    //     //         "data" => $bills,
+    //     //     ]);
+    //     // } 
+
+    //     //FUZAIL ......... BETWEEN.....
+    //     else if (!empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
+    //         $startDate = date('Y-m-d', strtotime($startdate));
+    //         $endDate = date('Y-m-d', strtotime($enddate));
+
+    //         $bills = Bill::where('bills.subadminid', $subadminid)
+    //             ->join('users', 'users.id', '=', 'bills.residentid')
+    //             ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //             ->select(
+    //                 'bills.*',
+    //                 'users.*',
+    //                 'residents.vechileno',
+    //                 'residents.residenttype',
+    //                 'residents.propertytype',
+    //                 'residents.committeemember'
+    //             )
+    //             ->where('paymenttype', $paymenttype)
+    //             ->where(function ($query) use ($startDate, $endDate) {
+    //                 $query->whereBetween('billstartdate', [$startDate, $endDate])
+    //                     ->orWhereBetween('billenddate', [$startDate, $endDate]);
+    //             })
+    //             ->get();
+
+    //         return response()->json([
+    //             "success" => true,
+    //             "data" => $bills,
+    //         ]);
+    //     } else if (!empty($status)) {
+
+
+
+
+    //         $bills = Bill::where('bills.subadminid', $subadminid)
+    //             ->join('users', 'users.id', '=', 'bills.residentid')
+    //             ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //             ->select(
+    //                 'bills.*',
+    //                 'users.*',
+    //                 'residents.vechileno',
+    //                 'residents.residenttype',
+    //                 'residents.propertytype',
+    //                 'residents.committeemember'
+
+    //             )
+    //             ->where('bills.status', $status)
+
+
+    //             ->get();
+
+    //         return response()->json([
+    //             "success" => true,
+    //             "data" => $bills,
+    //         ]);
+    //     } else if (!empty($paymenttype)) {
+    //         $bills = Bill::where('bills.subadminid', $subadminid)
+    //             ->join('users', 'users.id', '=', 'bills.residentid')
+    //             ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //             ->select(
+    //                 'bills.*',
+    //                 'users.*',
+    //                 'residents.vechileno',
+    //                 'residents.residenttype',
+    //                 'residents.propertytype',
+    //                 'residents.committeemember'
+
+    //             )
+
+    //             ->where('bills.paymenttype', $paymenttype)
+
+    //             ->get();
+
+    //         return response()->json([
+    //             "success" => true,
+    //             "data" => $bills,
+    //         ]);
+    //     }
+
+    //     //FUZAIL WORK YEAR MONTH AND DATE IN BETWEEN QUERY WORK
+
+    //     elseif (!empty($startdate) && !empty($enddate)) {
+    //         $startDate = date('Y-m-d', strtotime($startdate));
+    //         $endDate = date('Y-m-d', strtotime($enddate));
+
+    //         $bills = Bill::where('bills.subadminid', $subadminid)
+    //             ->join('users', 'users.id', '=', 'bills.residentid')
+    //             ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //             ->select(
+    //                 'bills.*',
+    //                 'users.*',
+    //                 'residents.vechileno',
+    //                 'residents.residenttype',
+    //                 'residents.propertytype',
+    //                 'residents.committeemember'
+    //             )
+    //             ->where(function ($query) use ($startDate, $endDate) {
+    //                 $query->whereBetween('billstartdate', [$startDate, $endDate])
+    //                     ->orWhereBetween('billenddate', [$startDate, $endDate]);
+    //             })
+    //             ->get();
+
+    //         return response()->json([
+    //             "success" => true,
+    //             "data" => $bills,
+    //         ]);
+    //     }
+
+    //     //SuleMan Work
+    //     // else if (!empty($startdate) && !empty($enddate)) {
+
+    //     //     $startDate = date('Y-m-d', strtotime($startdate));
+    //     //     $endDate = date('Y-m-d', strtotime($enddate));
+
+
+
+    //     //     $bills = Bill::where('bills.subadminid', $subadminid)
+    //     //         ->join('users', 'users.id', '=', 'bills.residentid')
+    //     //         ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //     //         ->select(
+    //     //             'bills.*',
+    //     //             'users.*',
+    //     //             'residents.vechileno',
+    //     //             'residents.residenttype',
+    //     //             'residents.propertytype',
+    //     //             'residents.committeemember'
+
+    //     //         )
+
+    //     //         ->whereMonth('billstartdate', $startDatecurrentMonth)->whereYear(
+    //     //             'billstartdate',
+    //     //             $startDatecurrentYear
+    //     //         )->whereMonth('billenddate', $endDatecurrentMonth)->whereYear(
+    //     //             'billenddate',
+    //     //             $endDatecurrentYear
+    //     //         )
+
+    //     //         ->get();
+
+
+    //     //     return response()->json([
+    //     //         "success" => true,
+    //     //         "data" => $bills,
+    //     //     ]);
+    //     // } 
+    //     else {
+
+
+    //         $bills = Bill::where('bills.subadminid', $subadminid)
+    //             ->join('users', 'users.id', '=', 'bills.residentid')
+    //             ->join('residents', 'residents.residentid', '=', 'bills.residentid')
+    //             ->select(
+    //                 'bills.*',
+    //                 'users.*',
+    //                 'residents.vechileno',
+    //                 'residents.residenttype',
+    //                 'residents.propertytype',
+    //                 'residents.committeemember'
+
+    //             )
+
+
+    //             ->get();
+
+    //         return response()->json([
+    //             "success" => true,
+    //             "data" => $bills,
+    //         ]);
+    //     }
+    // }
 }

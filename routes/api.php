@@ -32,11 +32,7 @@ use App\Http\Controllers\MarketPlaceController;
 use App\Http\Controllers\EmergencyController;
 use App\Http\Controllers\FinanceManagerController;
 use App\Http\Controllers\SuperAdminFinanceManagerController;
-
-
-
-
-
+use App\Http\Controllers\IndividualBillController;
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -269,6 +265,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
+
+
+
   //Super Admin Finance Managers
 
   Route::post('superadmin-finance-manager/superAdminFinanceMangerRegister', [SuperAdminFinanceManagerController::class, 'superAdminFinanceMangerRegister']);
@@ -276,10 +275,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('finance-manager/update', [SuperAdminFinanceManagerController::class, 'update']);
   Route::get('finance-manager/allresidentsBill/{subadminid}', [SuperAdminFinanceManagerController::class, 'allresidentsBill']);
   Route::get('finance-manager/searchResidentsBill/{subadminid}/{q?}', [SuperAdminFinanceManagerController::class, 'searchResidentsBill']);
-  Route::get('finance-manager/filterBills', [SuperAdminFinanceManagerController::class, 'filterBills']);
-  
+  Route::get('super-finance-manager/filterBills/', [SuperAdminFinanceManagerController::class, 'filterBills']);
+  Route::get('super-finance-manager/currentMonthBills/{subadminid}', [SuperAdminFinanceManagerController::class, 'currentMonthBills']);
 
-  
+  //INDIVIDUAL BILL
+
+  Route::post('individual-bill/createIndividualBill', [IndividualBillController::class, 'createIndividualBill']);
+
+  Route::get('individual-bill/getIndividualBillsForFinance/{subadminid}', [IndividualBillController::class, 'getIndividualBillsForFinance']);
+  Route::get('individual-bill/getIndividualBillsByResident/{residentid}', [IndividualBillController::class, 'getIndividualBillsByResident']);
 });
 
 

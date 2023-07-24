@@ -320,7 +320,7 @@ class ResidentController extends Controller
 
 
         $data = Resident::where('subadminid', $id)->where('status', 1)
-            ->join('users', 'users.id', '=', 'residents.residentid',)->with('bills')
+            ->join('users', 'users.id', '=', 'residents.residentid',)
             ->get();
 
 
