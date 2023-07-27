@@ -21,18 +21,17 @@ class ResidentController extends Controller
 
 
 
-    public function searchresident($q)
+    public function searchresident($subadminid, $q)
     {
 
-        // ->join('users', 'users.id', '=', 'residents.residentid')
-        // ->join('owners', 'owners.residentid', "=", 'residents.residentid');
+
         $resident = Resident::where(function ($query) use ($q) {
             $query->where('firstname', 'LIKE', '%' . $q . '%')
                 ->orWhere('lastname', 'LIKE', '%' . $q . '%')
                 ->orWhere('mobileno', 'LIKE', '%' . $q . '%')
                 ->orWhere('address', 'LIKE', '%' . $q . '%');
         })
-            ->where('status', 1)->join('users', 'users.id', '=', 'residents.residentid',)->with('bills')->get();
+            ->where('status', 1)->where('subadminid', $subadminid)->join('users', 'users.id', '=', 'residents.residentid',)->get();
 
 
         // $data = Resident::join('users', 'users.id', '=', 'residents.residentid',)
@@ -46,6 +45,24 @@ class ResidentController extends Controller
         //     ->orWhere('users.address', 'LIKE', '%' . $q . '%')->with('bills')
         //     // ->orWhere('residents.vechileno', 'LIKE', '%' . $q . '%')
         //     ->get();
+
+
+        return response()->json(
+            [
+                "success" => true,
+                "residentslist" => $resident
+            ]
+        );
+    }
+
+    public function filterResident($subadminid, $type)
+    {
+
+
+        $resident = Resident::where('propertytype', $type)->where('subadminid', $subadminid)
+            ->join('users', 'users.id', '=', 'residents.residentid',)->get();
+
+
 
 
         return response()->json(

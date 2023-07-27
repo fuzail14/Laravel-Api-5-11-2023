@@ -62,7 +62,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('registerresident', [ResidentController::class, 'registerresident']);
   Route::get('viewresidents/{id}', [ResidentController::class, 'viewresidents']);
   Route::get('deleteresident/{id}', [ResidentController::class, 'deleteresident']);
-  Route::get('searchresident/{q?}', [ResidentController::class, 'searchresident']);
+  Route::get('searchresident/{subadminid}/{q?}', [ResidentController::class, 'searchresident']);
+  Route::get('filterResident/{subadminid}/{type}', [ResidentController::class, 'filterResident']);
   Route::post('updateresident', [ResidentController::class, 'updateresident']);
   Route::get('loginresidentdetails/{residentid}', [ResidentController::class, 'loginresidentdetails']);
   Route::get('unverifiedresident/{subadminid}/{status}', [ResidentController::class, 'unverifiedresident']);
@@ -262,6 +263,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('finance-manager/bills/current-month-bills/{subadminid}/{financemanagerid}', [FinanceManagerController::class, 'currentMonthBills']);
   Route::get('finance-manager/bills/filter-bills/', [FinanceManagerController::class, 'filterBills']);
   Route::post('finance-manager/bills/search', [FinanceManagerController::class, 'billSearch']);
+  Route::get('finance-manager/individual-bills/filterIndividualBills/', [FinanceManagerController::class, 'filterIndividualBills']);
+
 
 
 
