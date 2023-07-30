@@ -17,20 +17,21 @@ class IndividualBillController extends Controller
             'subadminid' => 'required|exists:users,id',
             'financemanagerid' => 'required|exists:users,id',
             'residentid' => 'required|exists:residents,residentid',
-            'propertyid' => 'required|exists:properties,id',
+            //'propertyid' => 'required|exists:properties,id',
             'billstartdate' => 'required|date',
             'billenddate' => 'required|date',
             'duedate' => 'required|date',
             'billtype' => 'required|string',
             'paymenttype' => 'required|string',
             'status' => 'required|in:paid,unpaid,partiallypaid',
-            'charges' => 'required|numeric',
+            //'charges' => 'required|numeric',
+
             'latecharges' => 'required|numeric',
             'tax' => 'required|numeric',
-            'balance' => 'required|numeric',
-            'payableamount' => 'required|numeric',
-            'totalpaidamount' => 'required|numeric',
-            'isbilllate' => 'required|boolean',
+            //'balance' => 'required|numeric',
+            //'payableamount' => 'required|numeric',
+            //'totalpaidamount' => 'required|numeric',
+            'isbilllate' => 'required|numeric',
 
             // Validation rules for individualbillitems table
             'bill_items' => 'required|array',
@@ -46,24 +47,41 @@ class IndividualBillController extends Controller
 
         // Create individualbills record
 
+
+
+
+
+
+        $charges = 0;
+        foreach ($request['bill_items'] as $item) {
+            $charges += $item['billprice'];
+        }
+
         $individualBill = new IndividualBill;
         $individualBill->subadminid = $request->subadminid;
         $individualBill->financemanagerid = $request->financemanagerid;
         $individualBill->residentid = $request->residentid;
-        $individualBill->propertyid = $request->propertyid;
+        //$individualBill->propertyid = $request->propertyid;
         $individualBill->billstartdate = $request->billstartdate;
         $individualBill->billenddate = $request->billenddate;
         $individualBill->duedate = $request->duedate;
+
         $individualBill->billtype = $request->billtype;
         $individualBill->paymenttype = $request->paymenttype ?? 'NA';
         $individualBill->status = $request->status;
-        $individualBill->charges = $request->charges;
+
+        $individualBill->charges = $charges;
         $individualBill->latecharges = $request->latecharges;
+
         $individualBill->tax = $request->tax;
-        $individualBill->balance = $request->balance;
-        $individualBill->payableamount = $request->payableamount;
+
+        $individualBill->payableamount =  $request->tax + $charges;
+
+        $individualBill->balance = $request->payableamount;
+
         $individualBill->totalpaidamount = $request->totalpaidamount;
         $individualBill->isbilllate = $request->isbilllate;
+
         $individualBill->save();
 
 

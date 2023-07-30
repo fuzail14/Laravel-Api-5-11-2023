@@ -19,8 +19,9 @@ return new class extends Migration
             $table->foreign('financemanagerid')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('residentid');
             $table->foreign('residentid')->references('residentid')->on('residents')->onDelete('cascade');
-            $table->unsignedBigInteger('propertyid');
-            $table->foreign('propertyid')->references('id')->on('properties')->onDelete('cascade');
+            // $table->unsignedBigInteger('propertyid');
+            // $table->foreign('propertyid')->references('id')->on('properties')->onDelete('cascade');
+
             $table->date('billstartdate');
             $table->date('billenddate');
             $table->date('duedate');

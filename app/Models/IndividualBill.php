@@ -13,7 +13,7 @@ class IndividualBill extends Model
         'subadminid',
         'financemanagerid',
         'residentid',
-        'propertyid',
+        //'propertyid',
         'billstartdate',
         'billenddate',
         'duedate',
