@@ -205,7 +205,7 @@ class SuperAdminFinanceManagerController extends Controller
     {
 
 
-        $data = Bill::where('bills.subadminid', $id)
+        $data = Bill::where('bills.residentid', $id)
             ->join('users', 'users.id', '=', 'bills.residentid')
             ->join('residents', 'residents.residentid', '=', 'bills.residentid')
             ->select(
@@ -234,7 +234,7 @@ class SuperAdminFinanceManagerController extends Controller
 
 
 
-    public function searchResidentsBill($subadminid, $q)
+    public function searchResidentsBill($residentid, $q)
     {
 
 
@@ -264,7 +264,7 @@ class SuperAdminFinanceManagerController extends Controller
         //     "residentslist" => $data,
         // ]);
         if (!empty($q)) {
-            $bills = Bill::where('bills.subadminid', $subadminid)
+            $bills = Bill::where('bills.residentid', $residentid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
                 ->select(
@@ -306,7 +306,7 @@ class SuperAdminFinanceManagerController extends Controller
         $paymenttype = request()->paymenttype ?? null;
         $startdate = request()->startdate ?? null;
         $enddate = request()->enddate ?? null;
-        $subadminid = request()->subadminid ?? null;
+        $residentid = request()->residentid ?? null;
 
 
 
@@ -316,7 +316,7 @@ class SuperAdminFinanceManagerController extends Controller
             'enddate' => 'date|nullable',
             'paymenttype' => 'nullable',
             'status' => 'nullable',
-            'subadminid' => 'required|exists:subadmins,subadminid',
+            'residentid' => 'required|exists:users,id',
 
 
 
@@ -340,7 +340,7 @@ class SuperAdminFinanceManagerController extends Controller
         if (!empty($status) && !empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
 
 
-            $bills = Bill::where('bills.subadminid', $subadminid)
+            $bills = Bill::where('bills.residentid', $residentid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
                 ->select(
@@ -373,7 +373,7 @@ class SuperAdminFinanceManagerController extends Controller
         if (!empty($status) && !empty($paymenttype)) {
 
 
-            $bills = Bill::where('bills.subadminid', $subadminid)
+            $bills = Bill::where('bills.residentid', $residentid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
                 ->select(
@@ -396,7 +396,7 @@ class SuperAdminFinanceManagerController extends Controller
         } else if (!empty($status) && !empty($startdate) && !empty($enddate)) {
 
 
-            $bills = Bill::where('bills.subadminid', $subadminid)
+            $bills = Bill::where('bills.residentid', $residentid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
                 ->select(
@@ -425,7 +425,7 @@ class SuperAdminFinanceManagerController extends Controller
         } else if (!empty($paymenttype) && !empty($startdate) && !empty($enddate)) {
 
 
-            $bills = Bill::where('bills.subadminid', $subadminid)
+            $bills = Bill::where('bills.residentid', $residentid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
                 ->select(
@@ -453,7 +453,7 @@ class SuperAdminFinanceManagerController extends Controller
             ]);
         } else if (!empty($status)) {
 
-            $bills = Bill::where('bills.subadminid', $subadminid)
+            $bills = Bill::where('bills.residentid', $residentid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
                 ->select(
@@ -475,7 +475,7 @@ class SuperAdminFinanceManagerController extends Controller
                 "residentslist" => $bills,
             ]);
         } else if (!empty($paymenttype)) {
-            $bills = Bill::where('bills.subadminid', $subadminid)
+            $bills = Bill::where('bills.residentid', $residentid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
                 ->select(
@@ -499,7 +499,7 @@ class SuperAdminFinanceManagerController extends Controller
 
 
 
-            $bills = Bill::where('bills.subadminid', $subadminid)
+            $bills = Bill::where('bills.residentid', $residentid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
                 ->select(
@@ -528,7 +528,7 @@ class SuperAdminFinanceManagerController extends Controller
         } else {
 
 
-            $bills = Bill::where('bills.subadminid', $subadminid)
+            $bills = Bill::where('bills.residentid', $residentid)
                 ->join('users', 'users.id', '=', 'bills.residentid')
                 ->join('residents', 'residents.residentid', '=', 'bills.residentid')
                 ->select(

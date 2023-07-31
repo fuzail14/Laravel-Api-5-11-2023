@@ -263,7 +263,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::get('finance-manager/bills/current-month-bills/{subadminid}/{financemanagerid}', [FinanceManagerController::class, 'currentMonthBills']);
   Route::get('finance-manager/bills/filter-bills/', [FinanceManagerController::class, 'filterBills']);
   Route::post('finance-manager/bills/search', [FinanceManagerController::class, 'billSearch']);
-  Route::get('finance-manager/individual-bills/filterIndividualBills/', [FinanceManagerController::class, 'filterIndividualBills']);
 
 
 
@@ -276,10 +275,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::post('superadmin-finance-manager/superAdminFinanceMangerRegister', [SuperAdminFinanceManagerController::class, 'superAdminFinanceMangerRegister']);
   Route::get('finance-manager/view/{id}', [SuperAdminFinanceManagerController::class, 'view']);
   Route::post('finance-manager/update', [SuperAdminFinanceManagerController::class, 'update']);
-  Route::get('finance-manager/allresidentsBill/{subadminid}', [SuperAdminFinanceManagerController::class, 'allresidentsBill']);
-  Route::get('finance-manager/searchResidentsBill/{subadminid}/{q?}', [SuperAdminFinanceManagerController::class, 'searchResidentsBill']);
+  Route::get('finance-manager/allresidentsBill/{residentid}', [SuperAdminFinanceManagerController::class, 'allresidentsBill']);
+  Route::get('finance-manager/searchResidentsBill/{residentid}/{q?}', [SuperAdminFinanceManagerController::class, 'searchResidentsBill']);
   Route::get('super-finance-manager/filterBills/', [SuperAdminFinanceManagerController::class, 'filterBills']);
-  Route::get('super-finance-manager/currentMonthBills/{subadminid}', [SuperAdminFinanceManagerController::class, 'currentMonthBills']);
+  Route::get('super-finance-manager/currentMonthBills/{residentid}', [SuperAdminFinanceManagerController::class, 'currentMonthBills']);
 
   //INDIVIDUAL BILL
 
@@ -287,6 +286,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
   Route::get('individual-bill/getIndividualBillsForFinance/{subadminid}', [IndividualBillController::class, 'getIndividualBillsForFinance']);
   Route::get('individual-bill/getIndividualBillsByResident/{residentid}', [IndividualBillController::class, 'getIndividualBillsByResident']);
+  Route::get('individual-bill/filterIndividualBills/', [IndividualBillController::class, 'filterIndividualBills']);
 });
 
 
