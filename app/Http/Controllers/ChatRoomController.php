@@ -17,8 +17,8 @@ class ChatRoomController extends Controller
 
         $isValidate = Validator::make($request->all(), [
 
-            'loginuserid' => 'required|exists:users,id',
-            'chatuserid' => 'required|exists:users,id'
+            'sender' => 'required|exists:users,id',
+            'receiver' => 'required|exists:users,id'
 
         ]);
 
@@ -37,16 +37,16 @@ class ChatRoomController extends Controller
         }
 
 
-        $chatroom=Chatroom::where('loginuserid',$request->loginuserid)->where(
-            "chatuserid",$request->chatuserid)
+        $chatroom=Chatroom::where('sender',$request->sender)->where(
+            "receiver",$request->receiver)
         ->get();
 
         if($chatroom->isEmpty() )
 
         {
             
-            $chatroom2=  Chatroom::where('loginuserid',$request->chatuserid)->where(
-                "chatuserid",$request->loginuserid)
+            $chatroom2=  Chatroom::where('sender',$request->receiver)->where(
+                "receiver",$request->sender)
             ->get();
 
             
@@ -54,8 +54,8 @@ class ChatRoomController extends Controller
             {
 
             $chatroom = new Chatroom();
-            $chatroom->loginuserid=$request->loginuserid;
-            $chatroom->chatuserid=$request->chatuserid;
+            $chatroom->sender=$request->sender;
+            $chatroom->receiver=$request->receiver;
             $chatroom->save();
 
             return response()->json(["data" => [$chatroom]]);
@@ -84,25 +84,145 @@ class ChatRoomController extends Controller
 }
 
 
-public function fetchChatRoom($userid,$chatuserid)
-    {
+public function chatRequestStatus(Request $request)
+{
 
 
+    $isValidate = Validator::make($request->all(), [
 
-        $cov=Chatroom::where('loginuserid',$userid)
-        ->where('chatuserid',$chatuserid)
-        ->first()??Chatroom::where('loginuserid',$chatuserid)
-        ->where('chatuserid',$userid)->first();
+        'id' => 'required|exists:chatrooms,id',
+        'status' => 'required|in:default,block,pending,accepted,rejected',
+        'sender' => 'required|exists:users,id',
+        'receiver' => 'required|exists:users,id'
 
 
+    ]);
+
+
+    if ($isValidate->fails()) {
 
 
         return response()->json([
-            "success"=>true,
-            "data" => $cov]);
-
-
-
+            "errors" => $isValidate->errors()->all(),
+            "success" => false
+        ], 403);
 
     }
+
+    $chatRoom =   Chatroom::find($request->id);
+    // $chatRoom->sender=$request->sender;
+    // $chatRoom->receiver=$request->receiver;
+    if ($request->status=='accepted')
+
+    {
+        $chatRoom->receiver=$chatRoom->sender;
+     $chatRoom->sender=$request->receiver;
+     
+     
+     $chatRoom->status=$request->status;
+     $chatRoom->update();
+
+     return response()->json([
+        "data" => [$chatRoom],
+    ]);
+
+    }
+
+
+   else if ($request->status=='default')
+
+    {
+        $chatRoom->sender=$request->sender;
+     $chatRoom->receiver=$request->receiver;
+     
+     
+     $chatRoom->status=$request->status;
+     $chatRoom->update();
+
+
+     return response()->json([
+        "data" => [$chatRoom],
+    ]);
+
+    }
+    
+
+    else  if ($request->status=='rejected')
+
+    {
+  
+        $chatRoom->sender=$request->sender;
+        $chatRoom->receiver=$request->receiver;
+        
+        $chatRoom->status=$request->status;
+        $chatRoom->update();
+   
+     
+     
+     return response()->json([
+        "data" => [$chatRoom],
+    ]);
+
+    }
+
+    
+
+
+
+
+   
+
+
+
+
+}
+
+
+public function sendChatRequestStatus(Request $request)
+{
+
+
+    $isValidate = Validator::make($request->all(), [
+
+        'id' => 'required|exists:chatrooms,id',
+        'status' => 'required|in:default,block,pending,accepted,rejected',
+        'sender' => 'required|exists:users,id',
+        'receiver' => 'required|exists:users,id'
+
+
+    ]);
+
+
+    if ($isValidate->fails()) {
+
+
+        return response()->json([
+            "errors" => $isValidate->errors()->all(),
+            "success" => false
+        ], 403);
+
+    }
+
+    $chatRoom =   Chatroom::find($request->id);
+    $chatRoom->status=$request->status;
+    // $chatRoom->sender=$request->sender;
+    // $chatRoom->receiver=$request->receiver;
+    
+
+    
+    $chatRoom->update();
+
+
+
+
+    return response()->json([
+        "data" => [$chatRoom],
+    ]);
+
+
+
+
+}
+
+
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\IndividualBill;
-use App\Models\IndividualBillItem;
+use App\Models\Individualbill;
+use App\Models\Individualbillitem;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -57,7 +57,7 @@ class IndividualBillController extends Controller
             $charges += $item['billprice'];
         }
 
-        $individualBill = new IndividualBill;
+        $individualBill = new Individualbill;
         $individualBill->subadminid = $request->subadminid;
         $individualBill->financemanagerid = $request->financemanagerid;
         $individualBill->residentid = $request->residentid;
@@ -88,7 +88,7 @@ class IndividualBillController extends Controller
         // Create individualbillitems records
 
         foreach ($request['bill_items'] as $item) {
-            IndividualBillItem::create([
+            Individualbillitem::create([
                 'individualbillid' => $individualBill->id,
                 'billname' => $item['billname'],
                 'billprice' => $item['billprice'],
@@ -104,7 +104,7 @@ class IndividualBillController extends Controller
 
     public function getIndividualBillsForFinance($subadminid)
     {
-        $individualBills = IndividualBill::where('subadminid', $subadminid)->with('billItems')->get();
+        $individualBills = Individualbill::where('subadminid', $subadminid)->with('billItems')->get();
 
         return response()->json([
             'message' => 'Individual bills fetched successfully',
@@ -113,7 +113,7 @@ class IndividualBillController extends Controller
     }
     public function getIndividualBillsByResident($residentid)
     {
-        $individualBills = IndividualBill::where('residentid', $residentid)->with('billItems')->get();
+        $individualBills = Individualbill::where('residentid', $residentid)->with('billItems')->get();
 
         return response()->json([
             'message' => 'Individual bills fetched successfully',
@@ -159,7 +159,7 @@ class IndividualBillController extends Controller
             $startDate = date('Y-m-d', strtotime($startdate));
             $endDate = date('Y-m-d', strtotime($enddate));
 
-            $bills = IndividualBill::where('individualbills.subadminid', $subadminid)
+            $bills = Individualbill::where('individualbills.subadminid', $subadminid)
                 ->with('billItems')
                 ->where('individualbills.status', $status)
                 ->where('paymenttype', $paymenttype)
@@ -180,7 +180,7 @@ class IndividualBillController extends Controller
         if (!empty($status) && !empty($paymenttype)) {
 
 
-            $bills = IndividualBill::where('individualbills.subadminid', $subadminid)
+            $bills = Individualbill::where('individualbills.subadminid', $subadminid)
                 ->with('billItems')
                 ->where('paymenttype', $paymenttype)
                 ->where('individualbills.status', $status)
@@ -200,7 +200,7 @@ class IndividualBillController extends Controller
             $startDate = date('Y-m-d', strtotime($startdate));
             $endDate = date('Y-m-d', strtotime($enddate));
 
-            $bills = IndividualBill::where('individualbills.subadminid', $subadminid)
+            $bills = Individualbill::where('individualbills.subadminid', $subadminid)
                 ->with('billItems')
                 ->where('individualbills.status', $status)
                 ->where(function ($query) use ($startDate, $endDate) {
@@ -222,7 +222,7 @@ class IndividualBillController extends Controller
             $startDate = date('Y-m-d', strtotime($startdate));
             $endDate = date('Y-m-d', strtotime($enddate));
 
-            $bills = IndividualBill::where('individualbills.subadminid', $subadminid)
+            $bills = Individualbill::where('individualbills.subadminid', $subadminid)
                 ->with('billItems')
 
                 ->where('paymenttype', $paymenttype)
@@ -241,7 +241,7 @@ class IndividualBillController extends Controller
 
 
 
-            $bills = IndividualBill::where('individualbills.subadminid', $subadminid)
+            $bills = Individualbill::where('individualbills.subadminid', $subadminid)
                 ->with('billItems')
 
                 ->where('individualbills.status', $status)
@@ -254,7 +254,7 @@ class IndividualBillController extends Controller
                 'individualBills' => $bills
             ]);
         } else if (!empty($paymenttype)) {
-            $bills = IndividualBill::where('individualbills.subadminid', $subadminid)
+            $bills = Individualbill::where('individualbills.subadminid', $subadminid)
                 ->with('billItems')
 
 
@@ -274,7 +274,7 @@ class IndividualBillController extends Controller
             $startDate = date('Y-m-d', strtotime($startdate));
             $endDate = date('Y-m-d', strtotime($enddate));
 
-            $bills =  IndividualBill::where('individualbills.subadminid', $subadminid)
+            $bills =  Individualbill::where('individualbills.subadminid', $subadminid)
                 ->with('billItems')
 
                 ->where(function ($query) use ($startDate, $endDate) {
@@ -290,7 +290,7 @@ class IndividualBillController extends Controller
         } else {
 
 
-            $bills =  IndividualBill::where('individualbills.subadminid', $subadminid)
+            $bills =  Individualbill::where('individualbills.subadminid', $subadminid)
                 ->with('billItems')
 
 
@@ -343,7 +343,7 @@ class IndividualBillController extends Controller
             $startDate = date('Y-m-d', strtotime($startdate));
             $endDate = date('Y-m-d', strtotime($enddate));
 
-            $bills = IndividualBill::where('individualbills.residentid', $residentid)
+            $bills = Individualbill::where('individualbills.residentid', $residentid)
                 ->with('billItems')
                 ->where('individualbills.status', $status)
                 ->where('paymenttype', $paymenttype)
@@ -364,7 +364,7 @@ class IndividualBillController extends Controller
         if (!empty($status) && !empty($paymenttype)) {
 
 
-            $bills = IndividualBill::where('individualbills.residentid', $residentid)
+            $bills = Individualbill::where('individualbills.residentid', $residentid)
                 ->with('billItems')
                 ->where('paymenttype', $paymenttype)
                 ->where('individualbills.status', $status)
@@ -384,7 +384,7 @@ class IndividualBillController extends Controller
             $startDate = date('Y-m-d', strtotime($startdate));
             $endDate = date('Y-m-d', strtotime($enddate));
 
-            $bills = IndividualBill::where('individualbills.residentid', $residentid)
+            $bills = Individualbill::where('individualbills.residentid', $residentid)
                 ->with('billItems')
                 ->where('individualbills.status', $status)
                 ->where(function ($query) use ($startDate, $endDate) {
@@ -406,7 +406,7 @@ class IndividualBillController extends Controller
             $startDate = date('Y-m-d', strtotime($startdate));
             $endDate = date('Y-m-d', strtotime($enddate));
 
-            $bills = IndividualBill::where('individualbills.residentid', $residentid)
+            $bills = Individualbill::where('individualbills.residentid', $residentid)
                 ->with('billItems')
 
                 ->where('paymenttype', $paymenttype)
@@ -425,7 +425,7 @@ class IndividualBillController extends Controller
 
 
 
-            $bills = IndividualBill::where('individualbills.residentid', $residentid)
+            $bills = Individualbill::where('individualbills.residentid', $residentid)
                 ->with('billItems')
 
                 ->where('individualbills.status', $status)
@@ -438,7 +438,7 @@ class IndividualBillController extends Controller
                 'individualBills' => $bills
             ]);
         } else if (!empty($paymenttype)) {
-            $bills = IndividualBill::where('individualbills.residentid', $residentid)
+            $bills = Individualbill::where('individualbills.residentid', $residentid)
                 ->with('billItems')
 
 
@@ -458,7 +458,7 @@ class IndividualBillController extends Controller
             $startDate = date('Y-m-d', strtotime($startdate));
             $endDate = date('Y-m-d', strtotime($enddate));
 
-            $bills =  IndividualBill::where('individualbills.residentid', $residentid)
+            $bills =  Individualbill::where('individualbills.residentid', $residentid)
                 ->with('billItems')
 
                 ->where(function ($query) use ($startDate, $endDate) {
@@ -474,7 +474,7 @@ class IndividualBillController extends Controller
         } else {
 
 
-            $bills =  IndividualBill::where('individualbills.residentid', $residentid)
+            $bills =  Individualbill::where('individualbills.residentid', $residentid)
                 ->with('billItems')
 
 

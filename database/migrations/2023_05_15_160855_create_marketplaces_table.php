@@ -43,7 +43,8 @@ class CreateMarketplacesTable extends Migration
             $table->string('contact');
             $table->string('category');
             $table->string('condition');
-            $table->string('images');
+            // $table->string('images');
+            $table->enum('status', ['sold', 'forsale','unavailable'])->default('forsale');
 
             //$table->json('images')->nullable();
             $table->timestamps();

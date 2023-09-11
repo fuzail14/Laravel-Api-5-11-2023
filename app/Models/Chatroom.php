@@ -9,14 +9,14 @@ class Chatroom extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'loginuserid',
+        'sender',
 
      ];
 
 
      protected $casts = [
-        "loginuserid"=> 'integer',
-        "chatuserid"=> 'integer',
+        "sender"=> 'integer',
+        "receiver"=> 'integer',
 
 
     ];

@@ -57,11 +57,11 @@ class BillController extends Controller
         $getmonth = null;
         $month = null;
         $status = null;
-        $previousPayableAmount = 0.0;
-        $previousBalance = 0.0;
-        $billType = 'house';
-        $paymentType = 'NA';
-        $totalPaidAmount = 0.0;
+        $previousPayableAmount=0.0;
+        $previousBalance=0.0;
+        $billType='house';
+        $paymentType='NA';
+        $totalPaidAmount=0.0;
         $subadminid = $request->subadminid;
         $financemanagerid = $request->financemanagerid;
 
@@ -69,59 +69,60 @@ class BillController extends Controller
         $duedate = $request->duedate;
         $billstartdate = $request->billstartdate;
         $billenddate = $request->billenddate;
-        
 
         $residents = Resident::where('subadminid', $subadminid)
-            ->where('status', 1)
-            ->where('propertytype', 'house')
-            ->join('users', 'users.id', '=', 'residents.residentid')
-            ->get();
+        ->where('status', 1)
+        ->where('propertytype', 'house')
+        ->join('users', 'users.id', '=', 'residents.residentid')
+        ->get();
 
 
         foreach ($residents as $residents) {
 
             // fetching resident details from db
-
-            $residnentsLi = Houseresidentaddress::where('houseresidentaddresses.residentid', $residents->residentid)
-                ->join('residents', 'houseresidentaddresses.residentid', '=', 'residents.residentid')
-                ->with('property')
-                ->with('measurement')
-                ->first();
-
-
-            $measurement =  $residnentsLi->measurement;
-            $property =  $residnentsLi->property;
-            $residnentid = $residnentsLi->residentid;
+            
+            $residnentsLi = Houseresidentaddress::where('houseresidentaddresses.residentid', $residents->residentid )
+            ->join('residents', 'houseresidentaddresses.residentid', '=', 'residents.residentid')
+            ->with('property')
+            ->with('measurement')
+            ->first();
 
 
+            $measurement =  $residnentsLi ->measurement;
+            $property =  $residnentsLi ->property;
+            $residnentid= $residnentsLi->residentid;
+
+            
             $noOfusers = Familymember::where('subadminid', $subadminid)->where('residentid', $residnentid)->count();
             $residentItSelf = 1;
             $noOfAppUsers = $noOfusers + $residentItSelf;
 
-
+         
             $getmonth = Carbon::parse($billstartdate)->format('F Y');
             $month = $getmonth;
 
 
-            foreach ($measurement as $measurement) {
+            foreach ($measurement as $measurement) 
+            {
                 $measurementid = $measurement->id;
                 $charges = $measurement->charges;
-                $appcharge = $measurement->appcharges * $noOfAppUsers;
+                $appcharge = $measurement->appcharges;
                 $tax = $measurement->tax;
                 $payableamount = $appcharge + $tax + $charges;
                 $latecharges = $measurement->latecharges;
                 $balance = $payableamount;
             }
 
-            foreach ($property as $property) {
+            foreach ($property as $property) 
+            {
                 $propertyid = $property->id;
             }
 
 
 
-            $firstDate = Carbon::parse($billstartdate);
+        $firstDate = Carbon::parse($billstartdate);
             $existingBill = Bill::where('residentid', $residnentid)
-                ->where('subadminid', $subadminid)->where('billtype', $billType)
+            ->where('subadminid',$subadminid)->where('billtype',$billType)
                 ->whereMonth('billstartdate', $firstDate->month)
                 ->whereYear('billstartdate', $firstDate->year)
                 ->get();
@@ -139,20 +140,29 @@ class BillController extends Controller
 
 
                         return response()->json(['message' => 'the bill of this month is already generated !.']);
+
                     }
+
+
+                }
+
+
+            }
+            
+            $previousBill = Bill::where('residentid', $residnentid)->where('subadminid',$subadminid)
+                ->whereIn('status', ['paid', 'unpaid'])->whereIn('isbilllate', [0, 1])->GET();
+            if(!empty($previousBill[0]->id))
+            {
+                foreach ($previousBill as $previousBill)
+                {
+                    $previousPayableAmount=$previousBill->payableamount;
+                    $previousBalance=$previousBill->balance;
                 }
             }
-
-            $previousBill = Bill::where('residentid', $residnentid)->where('subadminid', $subadminid)
-                ->whereIn('status', ['paid', 'unpaid'])->whereIn('isbilllate', [0, 1])->GET();
-            if (!empty($previousBill[0]->id)) {
-                foreach ($previousBill as $previousBill) {
-                    $previousPayableAmount = $previousBill->payableamount;
-                    $previousBalance = $previousBill->balance;
-                }
-            } else {
-                $previousPayableAmount = 0;
-                $previousBalance = 0;
+            else
+            {
+                $previousPayableAmount=0;
+                $previousBalance=0;
             }
 
             $bill = new Bill();
@@ -166,9 +176,9 @@ class BillController extends Controller
                         'appcharges' => $appcharge,
                         'tax' => $tax,
                         'payableamount' => $payableamount + $previousPayableAmount,
-                        'balance' => $balance + $previousBalance,
+                        'balance' => $balance+ $previousBalance ,
                         'subadminid' => $subadminid,
-                        'financemanagerid' => $financemanagerid,
+                        'financemanagerid' =>$financemanagerid,
                         'residentid' => $residnentid,
                         'propertyid' => $propertyid,
                         'measurementid' => $measurementid,
@@ -180,26 +190,32 @@ class BillController extends Controller
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s'),
                         'noofappusers' => $noOfAppUsers,
-                        'billtype' => $billType,
-                        'paymenttype' => $paymentType,
-                        'totalpaidamount' => $totalPaidAmount
+                        'billtype'=>$billType,
+                        'paymenttype'=>$paymentType,
+                        'totalpaidamount'=>$totalPaidAmount
                     ],
 
                 ]
             );
+
         }
 
 
 
 
 
+        
 
 
-
-        return response()->json([
+             return response()->json([
             "success" => true,
             "message" => 'Bill generated Successfully'
         ]);
+
+
+
+
+
     }
 
 
@@ -210,14 +226,14 @@ class BillController extends Controller
 
         $currentDate = date('Y-m-d');
         $currentYear = date('Y', strtotime($currentDate));
-        $billType = 'house';
+        $billType='house';
         $currentMonth = date('m', strtotime($currentDate));
         $bills = Bill::where('subadminid', $subadminid)->where('billtype', $billType)
-            ->whereMonth('billenddate', $currentMonth)->whereYear(
-                'billenddate',
-                $currentYear
-            )
-
+         ->whereMonth('billenddate', $currentMonth)->whereYear(
+            'billenddate',
+            $currentYear
+        )
+     
             ->with('user')
             ->with('resident')
             ->with('measurement')
@@ -275,9 +291,9 @@ class BillController extends Controller
         $getmonth = null;
         $month = null;
         $status = null;
-        $previousPayableAmount = 0.0;
-        $previousBalance = 0.0;
-        $totalPaidAmount = 0.0;
+        $previousPayableAmount=0.0;
+        $previousBalance=0.0;
+        $totalPaidAmount=0.0;
 
         $subadminid = $request->subadminid;
         $financemanagerid = $request->financemanagerid;
@@ -285,60 +301,62 @@ class BillController extends Controller
         $duedate = $request->duedate;
         $billstartdate = $request->billstartdate;
         $billenddate = $request->billenddate;
-        $billType = 'societybuildingapartment';
-        $paymentType = 'NA';
+        $billType='societybuildingapartment';
+        $paymentType='NA';
 
         $residents = Resident::where('subadminid', $subadminid)
-            ->where('status', 1)
-            ->where('propertytype', 'apartment')
-            ->join('users', 'users.id', '=', 'residents.residentid')
-            ->get();
+        ->where('status', 1)
+        ->where('propertytype', 'apartment')
+        ->join('users', 'users.id', '=', 'residents.residentid')
+        ->get();
 
 
         foreach ($residents as $residents) {
 
             // fetching resident details from db
-
-            $residnentsLi = Apartmentresidentaddress::where('apartmentresidentaddresses.residentid', $residents->residentid)
-                ->join('residents', 'apartmentresidentaddresses.residentid', '=', 'residents.residentid')
-                ->with('societybuildingapartments')
-                ->with('measurement')
-                ->first();
-
-
-            $measurement =  $residnentsLi->measurement;
-            $property =  $residnentsLi->societybuildingapartments;
-            $residnentid = $residnentsLi->residentid;
+            
+            $residnentsLi = Apartmentresidentaddress::where('apartmentresidentaddresses.residentid', $residents->residentid )
+            ->join('residents', 'apartmentresidentaddresses.residentid', '=', 'residents.residentid')
+            ->with('societybuildingapartments')
+            ->with('measurement')
+            ->first();
 
 
+            $measurement =  $residnentsLi ->measurement;
+            $property =  $residnentsLi ->societybuildingapartments;
+            $residnentid= $residnentsLi->residentid;
+
+            
             $noOfusers = Familymember::where('subadminid', $subadminid)->where('residentid', $residnentid)->count();
             $residentItSelf = 1;
             $noOfAppUsers = $noOfusers + $residentItSelf;
 
-
+         
             $getmonth = Carbon::parse($billstartdate)->format('F Y');
             $month = $getmonth;
 
 
-            foreach ($measurement as $measurement) {
+            foreach ($measurement as $measurement) 
+            {
                 $measurementid = $measurement->id;
                 $charges = $measurement->charges;
-                $appcharge = $measurement->appcharges * $noOfAppUsers;
+                $appcharge = $measurement->appcharges;
                 $tax = $measurement->tax;
                 $payableamount = $appcharge + $tax + $charges;
                 $latecharges = $measurement->latecharges;
                 $balance = $payableamount;
             }
 
-            foreach ($property as $property) {
+            foreach ($property as $property) 
+            {
                 $propertyid = $property->id;
             }
 
 
 
-            $firstDate = Carbon::parse($billstartdate);
+        $firstDate = Carbon::parse($billstartdate);
             $existingBill = Bill::where('residentid', $residnentid)
-                ->where('subadminid', $subadminid)->where('billtype', $billType)
+            ->where('subadminid',$subadminid)->where('billtype',$billType)
                 ->whereMonth('billstartdate', $firstDate->month)
                 ->whereYear('billstartdate', $firstDate->year)
                 ->get();
@@ -356,20 +374,29 @@ class BillController extends Controller
 
 
                         return response()->json(['message' => 'the bill of this month is already generated !.']);
+
                     }
+
+
+                }
+
+
+            }
+            
+            $previousBill = Bill::where('residentid', $residnentid)->where('subadminid',$subadminid)
+                ->whereIn('status', ['paid','unpaid'])->whereIn('isbilllate', [0, 1])->GET();
+            if(!empty($previousBill[0]->id))
+            {
+                foreach ($previousBill as $previousBill)
+                {
+                    $previousPayableAmount=$previousBill->payableamount;
+                    $previousBalance=$previousBill->balance;
                 }
             }
-
-            $previousBill = Bill::where('residentid', $residnentid)->where('subadminid', $subadminid)
-                ->whereIn('status', ['paid', 'unpaid'])->whereIn('isbilllate', [0, 1])->GET();
-            if (!empty($previousBill[0]->id)) {
-                foreach ($previousBill as $previousBill) {
-                    $previousPayableAmount = $previousBill->payableamount;
-                    $previousBalance = $previousBill->balance;
-                }
-            } else {
-                $previousPayableAmount = 0;
-                $previousBalance = 0;
+            else
+            {
+                $previousPayableAmount=0;
+                $previousBalance=0;
             }
 
             $bill = new Bill();
@@ -383,9 +410,9 @@ class BillController extends Controller
                         'appcharges' => $appcharge,
                         'tax' => $tax,
                         'payableamount' => $payableamount + $previousPayableAmount,
-                        'balance' => $balance + $previousBalance,
+                        'balance' => $balance+ $previousBalance ,
                         'subadminid' => $subadminid,
-                        'financemanagerid' => $financemanagerid,
+                        'financemanagerid' =>$financemanagerid,
                         'residentid' => $residnentid,
                         'propertyid' => $propertyid,
                         'measurementid' => $measurementid,
@@ -397,27 +424,33 @@ class BillController extends Controller
                         'created_at' => date('Y-m-d H:i:s'),
                         'updated_at' => date('Y-m-d H:i:s'),
                         'noofappusers' => $noOfAppUsers,
-                        'billtype' => $billType,
-                        'paymenttype' => $paymentType,
-                        'totalpaidamount' => $totalPaidAmount
+                        'billtype'=>$billType,
+                        'paymenttype'=>$paymentType,
+                        'totalpaidamount'=>$totalPaidAmount
 
                     ],
 
                 ]
             );
+
         }
 
 
 
 
 
+        
 
 
-
-        return response()->json([
+             return response()->json([
             "success" => true,
             "message" => 'Bill generated Successfully'
         ]);
+
+
+
+
+
     }
 
     public function generatedsocietyapartmentbill($subadminid)
@@ -438,16 +471,16 @@ class BillController extends Controller
 
         //     )->get();
 
-        $billType = 'societybuildingapartment';
+        $billType='societybuildingapartment';
 
         $currentDate = date('Y-m-d');
         $currentYear = date('Y', strtotime($currentDate));
         $currentMonth = date('m', strtotime($currentDate));
-        $bills = Bill::where('subadminid', $subadminid)->where('billtype', $billType)->whereMonth('billenddate', $currentMonth)->whereYear(
+        $bills = Bill::where('subadminid', $subadminid) ->where('billtype', $billType)->whereMonth('billenddate', $currentMonth)->whereYear(
             'billenddate',
             $currentYear
         )
-
+       
             ->with('user')
             ->with('resident')
             ->with('measurement')
@@ -466,7 +499,7 @@ class BillController extends Controller
     }
 
 
-    public function monthlybills($residnentid)
+    public function monthlybills($residnentid )
     {
 
 
@@ -496,7 +529,7 @@ class BillController extends Controller
 
 
 
-
+    
 
 
     public function paybill(Request $request)
@@ -509,67 +542,79 @@ class BillController extends Controller
             'paymenttype' => 'required',
             'totalpaidamount' => 'required',
         ]);
-
-
+    
+    
         if ($isValidate->fails()) {
             return response()->json([
                 "errors" => $isValidate->errors()->all(),
                 "success" => false
             ], 403);
         }
-
-        $id = $request->id;
-        $paymentType = $request->paymenttype;
-        $totalPaidAmount = $request->totalpaidamount;
-        $billPaidStatus = 'paid';
-        $balance = 0.0;
-        $amount = 0.0;
-
-
-
+    
+        $id=$request->id;
+        $paymentType=$request->paymenttype;
+        $totalPaidAmount=$request->totalpaidamount;
+        $billPaidStatus='paid';
+        $balance=0.0;
+        $amount=0.0;
+        
 
 
+       
+        
 
-        $bill = Bill::find($id);
+        $bill=Bill::find($id);
 
 
 
-        if ($bill->payableamount == $totalPaidAmount && $bill->balance == 0.0) {
+        if($bill->payableamount==$totalPaidAmount&&$bill->balance==0.0)
+
+
+        {
 
             return response()->json([
                 "success" => true,
-                "message" => "Bill Already Paid"
+                "message"=>"Bill Already Paid"
             ]);
         }
+        
+       
+        $payableAmount=$bill->payableamount;
+        $balance=$bill->balance;
+
+        $paidAmount=$totalPaidAmount;
 
 
-        $payableAmount = $bill->payableamount;
-        $balance = $bill->balance;
+        $amount=$balance-$totalPaidAmount;
 
-        $paidAmount = $totalPaidAmount;
-
-
-        $amount = $balance - $totalPaidAmount;
-
-        if ($amount < 0) {
-            $amount = 0.0;
-        }
-
+        if($amount<0)
+        {$amount=0.0;}
+    
         // $bill->payableamount=$payableAmount;
-        $bill->balance = $amount;
-        $bill->totalpaidamount = $bill->totalpaidamount + $paidAmount;
-        $bill->status = $billPaidStatus;
-        $bill->paymenttype = $paymentType;
+        $bill->balance=$amount;
+        $bill->totalpaidamount=$bill->totalpaidamount+$paidAmount;
+        $bill->status=$billPaidStatus;
+        $bill->paymenttype=$paymentType;
         $bill->update();
 
 
 
 
-
+        
 
         return response()->json([
             "success" => true,
-            "message" => "Bill Paid Successfully"
+            "message"=>"Bill Paid Successfully"
         ]);
+
+
     }
+
+
+
+
+
+
+
+
 }

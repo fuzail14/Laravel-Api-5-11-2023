@@ -80,6 +80,10 @@ class ChatController extends Controller
        $chatneighbours=   Resident::where('subadminid', $subadminid)
        ->where('status',1)->join('users', 'residents.residentid', '=', 'users.id')
        ->get();
+    // $chatneighbours=   Resident::where('subadminid', $subadminid)
+    //    ->where('status',1)->join('users', 'residents.residentid', '=', 'users.id')
+    //    ->paginate(6);
+
 
         return
         response()->json(["success"=>true,

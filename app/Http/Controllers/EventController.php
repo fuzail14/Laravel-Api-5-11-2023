@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Eventimage;
+use App\Models\Gatekeeper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Event;
@@ -46,11 +47,21 @@ class EventController extends Controller
         $event->enddate= Carbon::parse($request->enddate)->format('Y-m-d');
         $event->active=$request->active;
         $event->save();
-
+        $fcm=[];
         $residents= Resident::where('subadminid',$request->userid)
         ->join('users','users.id','=','residents.residentid')->get();
 
-        $fcm=[];
+
+        $gatekeepers= Gatekeeper::where('subadminid',$request->userid)
+        ->join('users','users.id','=','gatekeepers.gatekeeperid')->get();
+
+        foreach ($gatekeepers as $datavals) {
+
+            array_push($fcm, $datavals['fcmtoken']);
+
+        }
+
+      
 
         foreach ($residents as $datavals) {
 
@@ -58,6 +69,7 @@ class EventController extends Controller
 
         }
 
+       
            
         $serverkey='AAAAcuxXPmA:APA91bEz-6ptcGS8KzmgmSLjb-6K_bva-so3i6Eyji_ihfncqXttVXjdBQoU6V8sKilzLb9MvSHFId-KK7idDwbGo8aXHpa_zjGpZuDpM67ICKM7QMCGUO_JFULTuZ_ApIOxdF3TXeDR';
         $url = 'https://fcm.googleapis.com/fcm/send';
@@ -67,10 +79,10 @@ class EventController extends Controller
         "android"=> [
             "priority"=> "high",
             "ttl"=> 60 * 60 * 1,
-            "android_channel_id"=>"smart-gate-notification"
+            "android_channel_id"=>"high_importance_channel"
 
         ],
-        "notification"=>['title'=>$event->title,'body'=>$event->description,
+        "notification"=>['title'=>'Event','body'=>$event->description,
         
         ]
 

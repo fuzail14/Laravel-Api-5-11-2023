@@ -29,6 +29,8 @@ return new class extends Migration
             $table->time('arrivaltime');
             $table->integer('status');
             $table->string('statusdescription');
+            $table->time('checkintime')->nullable();
+            $table->time('checkouttime')->nullable();
             $table->timestamps();
         });
     }

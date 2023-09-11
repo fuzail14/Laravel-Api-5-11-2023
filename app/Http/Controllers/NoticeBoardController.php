@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Notice;
 use App\Models\Resident;
+use App\Models\Gatekeeper;
+
 use Carbon\Carbon;
 class NoticeBoardController extends Controller
 {
@@ -37,11 +39,21 @@ class NoticeBoardController extends Controller
         $notice->status = $request->status;
         $notice->subadminid = $request->subadminid;
         $notice->save();
+        $fcm=[];
 
         $residents= Resident::where('subadminid',$request->subadminid)
         ->join('users','users.id','=','residents.residentid')->get();
 
-        $fcm=[];
+        
+
+        $gatekeepers= Gatekeeper::where('subadminid',$request->subadminid)
+        ->join('users','users.id','=','gatekeepers.gatekeeperid')->get();
+
+        foreach ($gatekeepers as $datavals) {
+
+            array_push($fcm, $datavals['fcmtoken']);
+
+        }
 
         foreach ($residents as $datavals) {
 
@@ -61,7 +73,7 @@ class NoticeBoardController extends Controller
             "android_channel_id"=>"one"
 
         ],
-        "notification"=>['title'=>$notice->noticetitle,'body'=>$notice->noticedetail,
+        "notification"=>['title'=>'Noticeboard','body'=>$notice->noticedetail,
         
         
         ]
@@ -110,7 +122,7 @@ class NoticeBoardController extends Controller
         if ($notice != null) {
             $notice = Notice::where('id', $id)->delete();
             return response()->json([
-                'data' => true,
+                'success' => true,
                 "data" => $notice, "message" => "delete Notice successfully"
             ], 200);
         } else {

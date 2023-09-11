@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Event\ChatEvent;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,7 @@ class RoleController extends Controller
             'lastname' => 'required|string|max:191',
             'cnic' => 'required|unique:users|max:191',
             'address' => 'required',
-            'mobileno' => 'required',
+            'mobileno' => 'required|unique:users',
             'roleid' => 'required',
             'rolename' => 'required',
             'password' => 'required',
@@ -165,6 +166,117 @@ class RoleController extends Controller
             ], 401);
         }
     }
+
+
+    public function loginWithMobileNumber(Request $request)
+    {
+        $isValidate = Validator::make($request->all(), [
+            'mobileno' => 'required',
+            'password' => 'required',
+        ]);
+        if ($isValidate->fails()) {
+            return response()->json([
+                "errors" => $isValidate->errors()->all(),
+                "success" => false
+            ], 403);
+        } else if (Auth::attempt(['mobileno' => $request->mobileno, 'password' => $request->password])) {
+            $user = Auth::user();
+
+
+            if ($user->roleid == 3) {
+
+                $users = User::where('mobileno', $user->mobileno)->first();
+                $tk =   $request->user()->createToken('token')->plainTextToken;
+                return response()->json([
+                    "success" => true,
+                    "data" => $users,
+                    "Bearer" => $tk
+                ]);
+            }   else if ($user->roleid == 5) {
+                $user = User::where('mobileno', $user->mobileno)
+                    ->join('familymembers', 'familymembers.familymemberid', '=', 'users.id')->select(
+                        'users.*',
+                        "familymembers.residentid",
+                        "familymembers.subadminid",
+
+
+                    )->first();
+
+                $tk =   $request->user()->createToken('token')->plainTextToken;
+                return response()->json([
+                    "success" => true,
+                    "data" => $user,
+                    "Bearer" => $tk
+                ]);
+            }  else {
+                return response()->json([
+                    "success" => false,
+                    "data" => "Unauthorized"
+                ], 401);
+            }
+        } else if (!Auth::attempt(['mobileno' => $request->mobileno, 'password' => $request->password])) {
+            return response()->json([
+                "success" => false,
+                "data" => "Unauthorized"
+            ], 401);
+        }
+    }
+
+
+
+    public function forgetpassword(Request $request)
+    {
+        $isValidate = Validator::make($request->all(), [
+            'mobileno' => 'required',
+        ]);
+        if ($isValidate->fails()) {
+            return response()->json([
+                "errors" => $isValidate->errors()->all(),
+                "success" => false
+            ], 403);
+
+        } 
+               
+        
+                $users = User::where('mobileno', $request->mobileno)->first();
+
+                if($users==null)
+                {    return response()->json([
+                    "success" => false,
+                    "errors" => ['No User Found'],
+                ], 403);
+    
+                }
+                else if ($users->rolename=='resident')
+                {
+                $tk =   $users->createToken('token')->plainTextToken;
+
+                return response()->json([
+                    "success" => true,
+                    "data" => $users,
+                    "Bearer" => $tk
+
+                ], 200);
+            }
+            else {
+                return response()->json([
+                    "success" => false,
+                    "errors" => ['Operation Failed.'],
+                ], 403);
+            }
+             
+            
+            
+        
+    }
+
+
+
+
+
+
+
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -205,6 +317,16 @@ class RoleController extends Controller
     }
 
 
+    public function eventfire()
+    {
+
+               event(new ChatEvent('helllo'));
+             
+
+
+
+         
+    }
 
     public  function resetpassword(Request $request)
 

@@ -1,15 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Marketplaceimages;
 use App\Models\Resident;
 use Illuminate\Http\Request;
-
 use App\Models\Marketplace;
 use Illuminate\Support\Facades\Validator;
 
-use Carbon\Carbon;
-use PhpParser\Parser\Multiple;
 
 class MarketPlaceController extends Controller
 {
@@ -29,7 +26,7 @@ class MarketPlaceController extends Controller
             'contact' => 'nullable',
             'category' => 'nullable',
             'condition' => 'nullable',
-            //'images.*' => 'image'
+          
 
 
         ]);
@@ -44,17 +41,11 @@ class MarketPlaceController extends Controller
         }
 
 
-        // $files = [];
-        // if ($request->hasfile('images')) {
-        //     foreach ($request->file('images') as $file) {
-        //         $name = time() . rand(1, 50) . '.' . $file->extension();
-        //         $file->move(public_path('files'), $name);
-        //         $files[] = $name;
-        //     }
-        // }
+     
 
 
         $product = new Marketplace();
+        $marketPlaceImages= new Marketplaceimages();
 
 
         $product->residentid = $request->residentid;
@@ -70,19 +61,26 @@ class MarketPlaceController extends Controller
         $images = $request->file('images');
         $imageName = time() . "." . $images->extension();
         $images->move(public_path('/storage/'), $imageName);
-        $product->images = $imageName;
         $product->save();
 
+        $marketPlaceImages->images = $imageName;
+        $marketPlaceImages->marketplaceid = $product->id;
+        $marketPlaceImages->save();
+
+      $product=  Marketplace::with('images')->find($product->id);
+        
         return response()->json([
             'success' => true,
             'data' => $product,
+            
         ]);
     }
 
 
     public function viewProducts($societyid)
     {
-        $products = Marketplace::where('societyid', $societyid)->get();
+        $products = Marketplace::where('societyid', $societyid)->with('users')
+        ->with('residents')->with('images')->get();
         return response()->json([
             'success' => true,
             'data' => $products
@@ -92,8 +90,9 @@ class MarketPlaceController extends Controller
     public function viewSellProductsResidnet($residentid)
     {
         $products = Marketplace::where('residentid', $residentid)
-            ->with('resident')
-            ->with('residentdata')->get();
+            ->with('users')
+            ->with('residents')
+            ->with('images')->get();
         return response()->json([
             'success' => true,
             'data' => $products
@@ -115,5 +114,44 @@ class MarketPlaceController extends Controller
                 "success" => true,
                 "data" => $chatneighbours
             ]);
+    }
+
+
+
+    public function productStatus(Request $request)
+
+    {  $isValidate = Validator::make($request->all(), [
+
+        'id' => 'required|exists:marketplaces,id',
+        'status' => 'required|in:sold,unavailable,forsale',
+    
+      
+
+
+    ]);
+
+
+    if ($isValidate->fails()) {
+        return response()->json([
+            "errors" => $isValidate->errors()->all(),
+            "success" => false
+
+        ], 403);
+    }
+
+
+    $products = Marketplace::find($request->id);
+    $products->status=$request->status;
+    $products->update();
+
+return response()->json([
+    'success' => true,
+    'data' => $products
+    
+]);
+
+
+
+
     }
 }

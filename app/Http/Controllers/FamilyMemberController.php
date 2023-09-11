@@ -15,25 +15,29 @@ class FamilyMemberController extends Controller
         $isValidate = Validator::make($request->all(), [
             'firstname' => 'required|string|max:191',
             'lastname' => 'required|string|max:191',
-            'cnic' => 'required|unique:users|max:191',
+            // 'cnic' => 'required|unique:users|max:191',
             'address' => 'required',
-            'mobileno' => 'required',
+            'mobileno' => 'required|unique:users',
             'residentid' => 'required|exists:residents,residentid',
             'subadminid' => 'required|exists:residents,subadminid',
             'password' => 'required',
-            'image' => 'required|image',
-        ]);
+            'image' => 'nullable|image',   
+             ]);
         if ($isValidate->fails()) {
             return response()->json([
                 "errors" => $isValidate->errors()->all(),
                 "success" => false
             ], 403);
         }
-    
-        $image = $request->file('image');
-        $imageName= time().".".$image->extension();
-        $image->move(public_path('/storage/'), $imageName);
         $user = new User;
+        $image = $request->file('image');
+
+        if ($image != null) {
+            $imageName = time() . "." . $image->extension();
+            $image->move(public_path('/storage/'), $imageName);
+            $user->image = $imageName;
+        }
+        
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->cnic = $request->cnic;
@@ -41,7 +45,7 @@ class FamilyMemberController extends Controller
         $user->mobileno= $request->mobileno;
         $user->roleid = 5;
         $user->rolename = 'familymember';
-        $user->image=$imageName;
+        $user->image=$imageName??'images/user.png';
         $user->password = Hash::make($request->password);
         $user->save();
 

@@ -15,21 +15,31 @@ class Marketplace extends Model
         "productname",
         "description",
         "productprice",
-        "images"
+        
 
     ];
 
-    // public function setFilenamesAttribute($value)
-    // {
-    //     $this->attributes['images'] = json_encode($value);
-    // }
-    public function resident()
+    
+    public function users()
     {
-        return $this->hasMany('App\Models\User', 'id', 'residentid');
+        return $this->hasOne('App\Models\User', 'id', 'residentid');
     }
-    public function residentdata()
+    public function residents()
     {
-        return $this->hasMany('App\Models\Resident', 'residentid', 'residentid');
+        return $this->hasOne('App\Models\Resident', 'residentid', 'residentid');
     }
+
+    public function images()
+    {
+        return $this->hasMany('App\Models\Marketplaceimages', 'marketplaceid', 'id');
+    }
+
+    public function society()
+    {
+        return $this->hasMany('App\Models\Marketplaceimages', 'marketplaceid', 'id');
+    }
+
+
+
 
 }

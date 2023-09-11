@@ -12,6 +12,8 @@ class Resident extends Model
     use HasFactory;
 
 protected $primarykey='residentid';
+protected $table = 'residents';
+
 
     protected $fillable = [
         "residentid",
@@ -129,10 +131,6 @@ protected $primarykey='residentid';
     public function societydata()
     {
         return $this->hasMany('App\Models\Subadmin', 'subadminid', 'subadminid');
-    }
-    public function bills()
-    {
-        return $this->hasMany('App\Models\Bill', 'residentid', 'residentid');
     }
  
     protected $casts = [ "status"=> 'integer',

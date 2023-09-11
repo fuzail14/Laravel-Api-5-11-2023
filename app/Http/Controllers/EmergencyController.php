@@ -75,8 +75,8 @@ class EmergencyController extends Controller
 
             ],
             "notification" => [
-                'title' => $emergency->problem, 
-                'body' => $emergency->description,
+                'title' => '🚨 Emergency 🚨', 
+                'body' => $emergency->problem,
             ]
 
         ];

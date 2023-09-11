@@ -20,7 +20,7 @@ class SubAdminController extends Controller
             'lastname' => 'required|string|max:191',
             'cnic' => 'required|unique:users|max:191',
             'address' => 'required',
-            'mobileno' => 'required',
+            'mobileno' => 'required|unique:users',
             'roleid' => 'required',
             'rolename' => 'required',
             'password' => 'required',
